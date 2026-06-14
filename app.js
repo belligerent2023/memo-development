@@ -292,6 +292,7 @@ function bootApp(token, username) {
   hydrateIcons();
   applyI18n();
   navigate("list");
+  applyPrefs();
   loadNotes();
   apiFetch("/users/me")
     .then(profile => {
@@ -629,7 +630,7 @@ function renderTable() {
       ? `<span class="conn-badge">${icon("connection")}<span>${connCount}</span></span>`
       : `<span style="color:var(--text-4);font-size:.78rem;padding-left:4px">—</span>`;
 
-    return `<tr class="${isActive ? "active" : ""}" onclick="openNote(${JSON.stringify(note.id)})">
+    return `<tr class="${isActive ? 'active' : ''}" onclick="openNote('${String(note.id).replace(/'/g,"\\'")}')">
       <td class="td-title-cell">
         <div class="note-row-inner">
           <div class="note-type-icon" style="--icon-color:${type.color}">${icon(type.icon)}</div>
@@ -1371,3 +1372,192 @@ document.addEventListener("DOMContentLoaded", () => {
   syncDateFilterChips();
   if (typeof LANGUAGES !== "undefined") initLangGrid();
 });
+// ── SETTINGS POPUP ───────────────────────────────────────────────────
+function toggleSettings(e) {
+  e.stopPropagation();
+  const popup = document.getElementById("settings-popup");
+  if (!popup) return;
+  const isOpen = !popup.classList.contains("hidden");
+  if (isOpen) { closeSettings(); return; }
+
+  // Заполняем данные
+  const username = _user?.username || "—";
+  const sp_avatar   = document.getElementById("sp-avatar");
+  const sp_username = document.getElementById("sp-username");
+  const sp_email    = document.getElementById("sp-email");
+  if (sp_avatar)   sp_avatar.textContent   = username.charAt(0).toUpperCase();
+  if (sp_username) sp_username.textContent = username;
+  if (sp_email)    sp_email.textContent    = _user?.email || "—";
+
+  // Статистика
+  const totalNotes = _notes.length;
+  const totalTags  = new Set(_notes.flatMap(n => n.tags || [])).size;
+  const totalConns = _notes.reduce((sum, n) => sum + (n.connections?.length || 0), 0);
+  const elN = document.getElementById("sp-stat-notes");
+  const elT = document.getElementById("sp-stat-tags");
+  const elC = document.getElementById("sp-stat-conn");
+  if (elN) elN.textContent = totalNotes;
+  if (elT) elT.textContent = totalTags;
+  if (elC) elC.textContent = totalConns;
+
+  // Текущий язык
+  const currentLang = window._lang || "en";
+  document.querySelectorAll(".sp-lang-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.lang === currentLang);
+  });
+
+  // Текущая тема
+  const currentTheme = document.documentElement.dataset.theme || "dark";
+  document.querySelectorAll(".sp-theme-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.theme === currentTheme);
+  });
+
+  // Позиционируем попап над workspace-pill
+  const pill = document.getElementById("workspace-pill");
+  const rect = pill?.getBoundingClientRect();
+  if (rect) {
+    popup.style.bottom = `${window.innerHeight - rect.top + 8}px`;
+    popup.style.left   = `${rect.left}px`;
+  }
+
+  syncPrefToggles();
+  popup.classList.remove("hidden");
+  document.addEventListener("click", closeSettingsOutside, { once: true });
+}
+
+function closeSettings() {
+  document.getElementById("settings-popup")?.classList.add("hidden");
+}
+
+function closeSettingsOutside(e) {
+  const popup = document.getElementById("settings-popup");
+  if (popup && !popup.contains(e.target)) closeSettings();
+  else if (popup && !popup.classList.contains("hidden")) {
+    document.addEventListener("click", closeSettingsOutside, { once: true });
+  }
+}
+
+function setSettingsLang(lang, el) {
+  document.querySelectorAll(".sp-lang-btn").forEach(b => b.classList.remove("active"));
+  if (el) el.classList.add("active");
+  changeLanguage(lang);
+  showToast(`Language: ${lang.toUpperCase()}`, true, 1400);
+}
+
+function setTheme(theme, el) {
+  document.querySelectorAll(".sp-theme-btn").forEach(b => b.classList.remove("active"));
+  if (el) el.classList.add("active");
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem("memo_theme", theme);
+  applyTheme(theme);
+  showToast(`Theme: ${theme}`, true, 1200);
+}
+
+function applyTheme(theme) {
+  const root = document.documentElement.style;
+  if (theme === "oled") {
+    root.setProperty("--bg",      "#000000");
+    root.setProperty("--bg-2",    "#080808");
+    root.setProperty("--bg-3",    "#0d0d0d");
+    root.setProperty("--surface", "#111111");
+  } else if (theme === "darker") {
+    root.setProperty("--bg",      "#060810");
+    root.setProperty("--bg-2",    "#090c16");
+    root.setProperty("--bg-3",    "#0d1120");
+    root.setProperty("--surface", "#0f1422");
+  } else {
+    root.setProperty("--bg",      "#0a0d14");
+    root.setProperty("--bg-2",    "#0f131c");
+    root.setProperty("--bg-3",    "#121826");
+    root.setProperty("--surface", "#111723");
+  }
+}
+
+async function exportNotes() {
+  showToast("Preparing export…", false);
+  try {
+    const data = await apiFetch("/notes?page=1&per_page=1000");
+    const notes = data?.items || [];
+    const blob = new Blob([JSON.stringify(notes, null, 2)], { type: "application/json" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `memo-export-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    hideToast();
+    showToast(`Exported ${notes.length} notes`, true, 2000);
+  } catch (err) {
+    showToast(`Export failed: ${err.message}`, true, 3000);
+  }
+}
+
+// Восстанавливаем тему при старте
+(function initTheme() {
+  const saved = localStorage.getItem("memo_theme") || "dark";
+  document.documentElement.dataset.theme = saved;
+  applyTheme(saved);
+})();
+// ── PREFERENCES ──────────────────────────────────────────────────────
+const _prefs = {
+  snippets:   true,
+  icons:      true,
+  typewriter: true,
+  clickOpen:  true,
+  ...JSON.parse(localStorage.getItem("memo_prefs") || "{}")
+};
+
+function savePref() {
+  localStorage.setItem("memo_prefs", JSON.stringify(_prefs));
+}
+
+function togglePref(key, el) {
+  _prefs[key] = !_prefs[key];
+  el.classList.toggle("on", _prefs[key]);
+  savePref();
+  applyPrefs();
+}
+
+function applyPrefs() {
+  // Snippets
+  document.querySelectorAll(".note-row-snippet").forEach(el => {
+    el.style.display = _prefs.snippets ? "" : "none";
+  });
+  // Icons
+  document.querySelectorAll(".note-type-icon").forEach(el => {
+    el.style.display = _prefs.icons ? "" : "none";
+  });
+}
+
+function syncPrefToggles() {
+  const keys = ["snippets", "icons", "typewriter", "clickOpen"];
+  keys.forEach(key => {
+    const el = document.getElementById(`toggle-${key === "clickOpen" ? "click-open" : key}`);
+    if (el) el.classList.toggle("on", _prefs[key]);
+  });
+}
+
+// Export .md
+async function exportNotesMd() {
+  showToast("Preparing markdown…", false);
+  try {
+    const data = await apiFetch("/notes?page=1&per_page=1000");
+    const notes = data?.items || [];
+    const md = notes.map(n => {
+      const tags = (n.tags || []).map(t => `#${t}`).join(" ");
+      const date = new Date(n.created_at).toLocaleDateString();
+      return `# ${noteTitle(n)}\n_${date}_ ${tags}\n\n${n.content}\n\n---\n`;
+    }).join("\n");
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `memo-export-${new Date().toISOString().slice(0,10)}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+    hideToast();
+    showToast(`Exported ${notes.length} notes as Markdown`, true, 2000);
+  } catch (err) {
+    showToast(`Export failed: ${err.message}`, true, 3000);
+  }
+}
