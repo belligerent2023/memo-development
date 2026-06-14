@@ -132,12 +132,13 @@
     </div>
 
     <div class="sidebar-bottom">
-      <div class="workspace-pill">
+      <div class="workspace-pill" onclick="toggleSettings(event)" id="workspace-pill">
         <div class="user-dot" id="user-avatar">?</div>
         <div class="workspace-copy">
           <span class="workspace-label">Workspace</span>
           <span class="user-name" id="user-display"></span>
         </div>
+        <svg class="sp-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m18 15-6-6-6 6"/></svg>
       </div>
       <button class="btn-icon btn-signout" onclick="logout()" title="Sign out"></button>
     </div>
@@ -358,6 +359,137 @@
       <div class="dr-body" id="dr-body">
         <div class="dr-loading">Loading your memories...</div>
       </div>
+    </div>
+  </div>
+  <!-- Settings Popup -->
+  <div id="settings-popup" class="settings-popup hidden">
+    <div class="settings-popup-inner">
+
+      <!-- Profile -->
+      <div class="sp-profile">
+        <div class="sp-avatar" id="sp-avatar">B</div>
+        <div class="sp-profile-copy">
+          <div class="sp-username" id="sp-username">—</div>
+          <div class="sp-email" id="sp-email">—</div>
+        </div>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <!-- Stats -->
+      <div class="sp-stats">
+        <div class="sp-stat">
+          <div class="sp-stat-value" id="sp-stat-notes">0</div>
+          <div class="sp-stat-label">Notes</div>
+        </div>
+        <div class="sp-stat">
+          <div class="sp-stat-value" id="sp-stat-tags">0</div>
+          <div class="sp-stat-label">Tags</div>
+        </div>
+        <div class="sp-stat">
+          <div class="sp-stat-value" id="sp-stat-conn">0</div>
+          <div class="sp-stat-label">Links</div>
+        </div>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <!-- Theme -->
+      <div class="sp-section-label">Theme</div>
+      <div class="sp-theme-row">
+        <button class="sp-theme-btn" data-theme="light" onclick="setTheme('light',this)">
+          <span class="sp-theme-dot" style="background:#f0f2f8;border-color:rgba(100,110,140,0.3)"></span> Light
+        </button>
+        <button class="sp-theme-btn active" data-theme="dark" onclick="setTheme('dark',this)">
+          <span class="sp-theme-dot" style="background:#1a2232"></span> Dark
+        </button>
+        <button class="sp-theme-btn" data-theme="darker" onclick="setTheme('darker',this)">
+          <span class="sp-theme-dot" style="background:#0d0f18"></span> Darker
+        </button>
+        <button class="sp-theme-btn" data-theme="oled" onclick="setTheme('oled',this)">
+          <span class="sp-theme-dot" style="background:#000"></span> OLED
+        </button>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <!-- Language -->
+      <div class="sp-section-label">Interface language</div>
+      <div class="sp-lang-row" id="sp-lang-row">
+        <button class="sp-lang-btn active" data-lang="en" onclick="setSettingsLang('en',this)">EN</button>
+        <button class="sp-lang-btn" data-lang="ru" onclick="setSettingsLang('ru',this)">RU</button>
+        <button class="sp-lang-btn" data-lang="de" onclick="setSettingsLang('de',this)">DE</button>
+        <button class="sp-lang-btn" data-lang="fr" onclick="setSettingsLang('fr',this)">FR</button>
+        <button class="sp-lang-btn" data-lang="es" onclick="setSettingsLang('es',this)">ES</button>
+        <button class="sp-lang-btn" data-lang="zh" onclick="setSettingsLang('zh',this)">ZH</button>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <!-- Preferences -->
+      <div class="sp-section-label">Preferences</div>
+      <div class="sp-prefs">
+        <label class="sp-toggle-row" title="Show snippet preview under note title">
+          <span class="sp-toggle-label">
+            <span>Show snippets</span>
+            <span class="sp-pref-sub">Preview text under note title</span>
+          </span>
+          <div class="sp-toggle" id="toggle-snippets" onclick="togglePref('snippets',this)">
+            <div class="sp-toggle-thumb"></div>
+          </div>
+        </label>
+        <label class="sp-toggle-row" title="Show note type icon in list">
+          <span class="sp-toggle-label">
+            <span>Type icons</span>
+            <span class="sp-pref-sub">Colored icon per note category</span>
+          </span>
+          <div class="sp-toggle on" id="toggle-icons" onclick="togglePref('icons',this)">
+            <div class="sp-toggle-thumb"></div>
+          </div>
+        </label>
+        <label class="sp-toggle-row" title="Animate AI responses letter by letter">
+          <span class="sp-toggle-label">
+            <span>Typewriter effect</span>
+            <span class="sp-pref-sub">Animate AI chat responses</span>
+          </span>
+          <div class="sp-toggle on" id="toggle-typewriter" onclick="togglePref('typewriter',this)">
+            <div class="sp-toggle-thumb"></div>
+          </div>
+        </label>
+        <label class="sp-toggle-row" title="Open note panel with single click">
+          <span class="sp-toggle-label">
+            <span>Click to open</span>
+            <span class="sp-pref-sub">Single click opens detail panel</span>
+          </span>
+          <div class="sp-toggle on" id="toggle-click-open" onclick="togglePref('clickOpen',this)">
+            <div class="sp-toggle-thumb"></div>
+          </div>
+        </label>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <!-- Data -->
+      <div class="sp-section-label">Data</div>
+      <div class="sp-actions">
+        <button class="sp-action-btn" onclick="exportNotes()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export notes (.json)
+        </button>
+        <button class="sp-action-btn" onclick="exportNotesMd()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Export notes (.md)
+        </button>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <!-- Sign out -->
+      <button class="sp-action-btn danger" onclick="logout(); closeSettings()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+
     </div>
   </div>
 
