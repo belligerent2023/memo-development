@@ -16,6 +16,7 @@
 </head>
 <body>
 
+
 <!-- ── AUTH ─────────────────────────────────────────── -->
 <div id="view-auth">
   <div class="auth-glow"></div>
@@ -71,6 +72,7 @@
   </div>
 </div>
 
+
 <!-- ── APP ──────────────────────────────────────────── -->
 <div id="view-app">
 
@@ -93,7 +95,7 @@
       <!-- Search -->
       <button class="search-trigger" onclick="openSearch()">
         <div class="search-trigger-left">
-          <span class="search-dot"></span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span id="sidebar-search-text">Search anything...</span>
         </div>
         <span class="kbd">Ctrl K</span>
@@ -103,19 +105,27 @@
     <div class="sidebar-nav">
       <div class="nav-block">
         <button id="nav-list" class="nav-item active" onclick="navigate('list')">
-          <span class="nav-icon"></span>
+          <span class="nav-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </span>
           <span class="nav-label">All notes</span>
         </button>
         <button id="nav-canvas" class="nav-item" onclick="navigate('canvas')">
-          <span class="nav-icon"></span>
+          <span class="nav-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/><line x1="6" y1="6" x2="9.5" y2="10.5"/><line x1="18" y1="6" x2="14.5" y2="10.5"/><line x1="6" y1="18" x2="9.5" y2="13.5"/><line x1="18" y1="18" x2="14.5" y2="13.5"/></svg>
+          </span>
           <span class="nav-label">Map</span>
         </button>
         <button class="nav-item" onclick="openChat()">
-          <span class="nav-icon"></span>
+          <span class="nav-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </span>
           <span class="nav-label">Ask notes</span>
         </button>
         <button class="nav-item" onclick="openDailyReview()">
-          <span class="nav-icon"></span>
+          <span class="nav-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </span>
           <span class="nav-label">Daily Review</span>
         </button>
       </div>
@@ -140,7 +150,9 @@
         </div>
         <svg class="sp-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m18 15-6-6-6 6"/></svg>
       </div>
-      <button class="btn-icon btn-signout" onclick="logout()" title="Sign out"></button>
+      <button class="btn-icon btn-signout" onclick="logout()" title="Sign out">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
   </nav>
 
@@ -160,7 +172,7 @@
         </div>
         <div class="topbar-center">
           <button class="topbar-search topbar-search-wide" onclick="openSearch()">
-            <span class="search-icon"></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <span id="topbar-search-text">Search notes, tags, or connections...</span>
             <span class="kbd" style="margin-left:auto">Ctrl K</span>
           </button>
@@ -227,12 +239,70 @@
             <table class="notes-table">
               <tbody id="notes-tbody"></tbody>
             </table>
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state hidden">
+              <div class="memo-cat-wrap">
+                <svg class="memo-cat" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Хвост -->
+                  <path class="cat-tail" d="M 68 95 Q 90 90 95 75 Q 100 60 88 58" stroke="var(--accent)" stroke-width="4" fill="none" stroke-linecap="round"/>
+                  <!-- Тело -->
+                  <ellipse cx="55" cy="88" rx="28" ry="22" fill="var(--accent)" opacity="0.15"/>
+                  <ellipse cx="55" cy="86" rx="26" ry="20" fill="var(--accent)" opacity="0.25"/>
+                  <!-- Голова -->
+                  <circle cx="55" cy="58" r="22" fill="var(--accent)" opacity="0.9"/>
+                  <!-- Уши -->
+                  <polygon points="36,42 30,24 46,36" fill="var(--accent)"/>
+                  <polygon points="74,42 80,24 64,36" fill="var(--accent)"/>
+                  <!-- Внутри ушей -->
+                  <polygon points="37,40 33,28 44,37" fill="var(--accent-2)" opacity="0.5"/>
+                  <polygon points="73,40 77,28 66,37" fill="var(--accent-2)" opacity="0.5"/>
+                  <!-- Глаза -->
+                  <ellipse class="cat-eye-left"  cx="47" cy="56" rx="4" ry="4.5" fill="#1a1d2e"/>
+                  <ellipse class="cat-eye-right" cx="63" cy="56" rx="4" ry="4.5" fill="#1a1d2e"/>
+                  <!-- Блики в глазах -->
+                  <circle cx="48.5" cy="54.5" r="1.2" fill="white"/>
+                  <circle cx="64.5" cy="54.5" r="1.2" fill="white"/>
+                  <!-- Нос -->
+                  <ellipse cx="55" cy="63" rx="2.5" ry="1.8" fill="#1a1d2e" opacity="0.7"/>
+                  <!-- Усы левые -->
+                  <line x1="52" y1="63" x2="35" y2="60" stroke="#1a1d2e" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
+                  <line x1="52" y1="64" x2="35" y2="66" stroke="#1a1d2e" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
+                  <!-- Усы правые -->
+                  <line x1="58" y1="63" x2="75" y2="60" stroke="#1a1d2e" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
+                  <line x1="58" y1="64" x2="75" y2="66" stroke="#1a1d2e" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
+                  <!-- Рот -->
+                  <path d="M 52 66 Q 55 70 58 66" stroke="#1a1d2e" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.5"/>
+                  <!-- Лапки -->
+                  <ellipse cx="40" cy="104" rx="10" ry="7" fill="var(--accent)" opacity="0.85"/>
+                  <ellipse cx="70" cy="104" rx="10" ry="7" fill="var(--accent)" opacity="0.85"/>
+                  <!-- Клубок -->
+                  <g class="cat-yarn">
+                    <circle cx="85" cy="100" r="10" fill="none" stroke="#f472b6" stroke-width="2.5" opacity="0.8"/>
+                    <circle cx="85" cy="100" r="7"  fill="none" stroke="#f472b6" stroke-width="1.5" opacity="0.6"/>
+                    <circle cx="85" cy="100" r="4"  fill="#f472b6" opacity="0.4"/>
+                    <line x1="68" y1="63" x2="77" y2="92" stroke="#f472b6" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.6"/>
+                  </g>
+                </svg>
+
+                <!-- Лапка тянется к клубку -->
+                <svg class="cat-paw-reach" viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M 5 25 Q 20 10 40 15 Q 50 17 55 22" stroke="var(--accent)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.85"/>
+                  <ellipse cx="55" cy="23" rx="6" ry="5" fill="var(--accent)" opacity="0.85"/>
+                </svg>
+              </div>
+
+              <div class="empty-state-text">
+                <h3 class="empty-title">Nothing here yet</h3>
+                <p class="empty-sub">Memo Cat is waiting for your first thought.<br>Capture something — an idea, a task, a quote.</p>
+                <button class="btn btn-primary empty-cta" onclick="toggleComposer(true)">
+                  + Create first note
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="load-more-wrap">
-          <button id="load-more-btn" class="btn btn-ghost hidden" onclick="loadMoreNotes()">
-            Load more
-          </button>
+          <button id="load-more-btn" class="btn btn-ghost hidden" onclick="loadMoreNotes()">Load more</button>
         </div>
       </div>
 
@@ -243,10 +313,14 @@
           <div class="graph-controls">
             <button class="graph-ctrl-btn" title="Zoom in"
               onclick="_graphTransform.scale=Math.min(4,_graphTransform.scale*1.25);_applyGraphTransform()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
-            <button class="graph-ctrl-btn" title="Reset view" onclick="resetGraph()"></button>
+            <button class="graph-ctrl-btn" title="Reset view" onclick="resetGraph()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
             <button class="graph-ctrl-btn" title="Zoom out"
               onclick="_graphTransform.scale=Math.max(0.2,_graphTransform.scale*0.8);_applyGraphTransform()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
           </div>
           <div class="graph-hint">Scroll to zoom · Drag to pan</div>
@@ -262,7 +336,9 @@
         <!-- Header -->
         <div class="detail-pane-header">
           <div class="detail-pane-title-row">
-            <div class="detail-note-icon"></div>
+            <div class="detail-note-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
             <div class="detail-pane-title-wrap">
               <h2 id="panel-title">Note</h2>
               <div class="detail-pane-meta" id="panel-date"></div>
@@ -270,24 +346,26 @@
           </div>
           <div class="detail-pane-actions">
             <button class="btn-icon detail-action-btn" id="pin-action-btn" onclick="togglePin()" title="Pin">
-              <span class="pin-slot"></span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
             </button>
             <button class="btn-icon detail-action-btn" id="panel-insight-trigger" title="AI insight" style="display:none">
-              <span class="spark-slot"></span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             </button>
             <button class="btn-icon detail-action-btn" onclick="startEditingPanel()" title="Edit">
-              <span class="edit-slot"></span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
             <button class="btn-icon detail-action-btn danger" onclick="deleteCurrentNote()" title="Delete">
-              <span class="trash-slot"></span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             </button>
-            <button class="btn-icon detail-close-mobile" onclick="closeNotePanel()" title="Close"></button>
+            <button class="btn-icon detail-close-mobile" onclick="closeNotePanel()" title="Close">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
           </div>
         </div>
 
         <div class="detail-pane-scroll">
 
-          <!-- Tags -->
+          <!-- Tags + body -->
           <div class="detail-pane-content">
             <div class="detail-tags" id="panel-tags"></div>
             <div class="note-panel-body" id="panel-body"></div>
@@ -297,17 +375,19 @@
           <!-- AI Summary -->
           <div id="ai-summary-block" class="detail-pane-side" style="display:none">
             <div class="detail-card">
-              <div class="detail-card-head">✦ AI Summary</div>
+              <div class="detail-card-head">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                AI Summary
+              </div>
               <div id="ai-summary-text" style="padding:0 14px 14px;color:var(--text-2);font-size:.88rem;line-height:1.65"></div>
               <div style="display:flex;gap:8px;padding:0 10px 10px">
                 <button class="action-item" onclick="openChat()" style="flex:1">
-                  <span class="brain-slot" style="font-size:.9rem">🧠</span> Ask a follow-up
-                  <svg style="margin-left:auto" width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  Ask a follow-up
+                  <svg style="margin-left:auto" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
                 <button class="btn btn-ghost" id="copy-summary-btn" onclick="copySummary()" style="font-size:.78rem;min-height:36px;padding:0 12px">
-                  Copy summary
+                  Copy
                 </button>
               </div>
             </div>
@@ -316,24 +396,35 @@
           <!-- Connections -->
           <div class="detail-pane-side">
             <div class="detail-card" id="connections-section">
-              <div class="detail-card-head">🔗 Connections</div>
+              <div class="detail-card-head">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                Connections
+              </div>
               <div id="panel-connections" style="padding:0 10px 10px"></div>
             </div>
 
             <div class="detail-card">
-              <div class="detail-card-head">Related notes</div>
+              <div class="detail-card-head">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                Related notes
+              </div>
               <div id="panel-similar" style="padding:0 10px 10px"></div>
             </div>
 
             <!-- Actions -->
             <div class="detail-card">
-              <div class="detail-card-head">Actions</div>
+              <div class="detail-card-head">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                Actions
+              </div>
               <div class="detail-action-list">
                 <button class="action-item" onclick="copyNoteLink()">
-                  <span class="copy-slot"></span> Copy note link
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy note link
                 </button>
                 <button class="action-item" onclick="moveToTrash()" style="color:var(--red)">
-                  <span class="trash-slot"></span> Move to trash
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                  Move to trash
                 </button>
               </div>
             </div>
@@ -354,13 +445,16 @@
           <div class="dr-title">✦ Daily Review</div>
           <div class="dr-subtitle" id="dr-subtitle"></div>
         </div>
-        <button class="btn-icon dr-close-btn" onclick="closeDailyReview()" style="font-size:1.1rem"></button>
+        <button class="btn-icon dr-close-btn" onclick="closeDailyReview()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
       </div>
       <div class="dr-body" id="dr-body">
         <div class="dr-loading">Loading your memories...</div>
       </div>
     </div>
   </div>
+
   <!-- Settings Popup -->
   <div id="settings-popup" class="settings-popup hidden">
     <div class="settings-popup-inner">
@@ -372,6 +466,9 @@
           <div class="sp-username" id="sp-username">—</div>
           <div class="sp-email" id="sp-email">—</div>
         </div>
+        <button class="btn-icon sp-edit-profile" title="Edit profile" onclick="openEditProfile()" style="margin-left:auto;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
       </div>
 
       <div class="sp-divider"></div>
@@ -398,16 +495,59 @@
       <div class="sp-section-label">Theme</div>
       <div class="sp-theme-row">
         <button class="sp-theme-btn" data-theme="light" onclick="setTheme('light',this)">
-          <span class="sp-theme-dot" style="background:#f0f2f8;border-color:rgba(100,110,140,0.3)"></span> Light
+          <span class="sp-theme-dot" style="background:#f0f2f8;border-color:rgba(100,110,140,0.30)"></span>Light
         </button>
         <button class="sp-theme-btn active" data-theme="dark" onclick="setTheme('dark',this)">
-          <span class="sp-theme-dot" style="background:#1a2232"></span> Dark
+          <span class="sp-theme-dot" style="background:#1a2232"></span>Dark
         </button>
         <button class="sp-theme-btn" data-theme="darker" onclick="setTheme('darker',this)">
-          <span class="sp-theme-dot" style="background:#0d0f18"></span> Darker
+          <span class="sp-theme-dot" style="background:#0d0f18"></span>Darker
         </button>
         <button class="sp-theme-btn" data-theme="oled" onclick="setTheme('oled',this)">
-          <span class="sp-theme-dot" style="background:#000"></span> OLED
+          <span class="sp-theme-dot" style="background:#000"></span>OLED
+        </button>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <!-- Accent -->
+      <div class="sp-section-label">Accent color</div>
+      <div class="sp-accent-row">
+        <button class="sp-accent-btn active" data-accent="violet" onclick="setAccent('violet',this)" style="--c:#7b68ee"><span></span></button>
+        <button class="sp-accent-btn" data-accent="blue"   onclick="setAccent('blue',this)"   style="--c:#4f9cf9"><span></span></button>
+        <button class="sp-accent-btn" data-accent="teal"   onclick="setAccent('teal',this)"   style="--c:#2dd4c4"><span></span></button>
+        <button class="sp-accent-btn" data-accent="green"  onclick="setAccent('green',this)"  style="--c:#44d19a"><span></span></button>
+        <button class="sp-accent-btn" data-accent="rose"   onclick="setAccent('rose',this)"   style="--c:#f472b6"><span></span></button>
+        <button class="sp-accent-btn" data-accent="orange" onclick="setAccent('orange',this)" style="--c:#fb923c"><span></span></button>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <!-- Font size -->
+      <div class="sp-section-label">Font size</div>
+      <div class="sp-size-row">
+        <button class="sp-size-btn" data-size="13" onclick="setFontSize(13,this)">S</button>
+        <button class="sp-size-btn active" data-size="14" onclick="setFontSize(14,this)">M</button>
+        <button class="sp-size-btn" data-size="15" onclick="setFontSize(15,this)">L</button>
+        <button class="sp-size-btn" data-size="16" onclick="setFontSize(16,this)">XL</button>
+      </div>
+
+      <div class="sp-divider"></div>
+
+      <!-- Density -->
+      <div class="sp-section-label">Note density</div>
+      <div class="sp-density-row">
+        <button class="sp-density-btn" data-density="compact" onclick="setDensity('compact',this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="3" y1="14" x2="21" y2="14"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          Compact
+        </button>
+        <button class="sp-density-btn active" data-density="normal" onclick="setDensity('normal',this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          Normal
+        </button>
+        <button class="sp-density-btn" data-density="comfortable" onclick="setDensity('comfortable',this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/></svg>
+          Airy
         </button>
       </div>
 
@@ -429,42 +569,55 @@
       <!-- Preferences -->
       <div class="sp-section-label">Preferences</div>
       <div class="sp-prefs">
-        <label class="sp-toggle-row" title="Show snippet preview under note title">
+
+        <div class="sp-toggle-row" onclick="togglePref('snippets', document.getElementById('toggle-snippets'))">
           <span class="sp-toggle-label">
             <span>Show snippets</span>
-            <span class="sp-pref-sub">Preview text under note title</span>
+            <span class="sp-pref-sub">Preview text under title</span>
           </span>
-          <div class="sp-toggle" id="toggle-snippets" onclick="togglePref('snippets',this)">
-            <div class="sp-toggle-thumb"></div>
-          </div>
-        </label>
-        <label class="sp-toggle-row" title="Show note type icon in list">
+          <div class="sp-toggle on" id="toggle-snippets"><div class="sp-toggle-thumb"></div></div>
+        </div>
+
+        <div class="sp-toggle-row" onclick="togglePref('icons', document.getElementById('toggle-icons'))">
           <span class="sp-toggle-label">
             <span>Type icons</span>
             <span class="sp-pref-sub">Colored icon per note category</span>
           </span>
-          <div class="sp-toggle on" id="toggle-icons" onclick="togglePref('icons',this)">
-            <div class="sp-toggle-thumb"></div>
-          </div>
-        </label>
-        <label class="sp-toggle-row" title="Animate AI responses letter by letter">
+          <div class="sp-toggle on" id="toggle-icons"><div class="sp-toggle-thumb"></div></div>
+        </div>
+
+        <div class="sp-toggle-row" onclick="togglePref('typewriter', document.getElementById('toggle-typewriter'))">
           <span class="sp-toggle-label">
             <span>Typewriter effect</span>
             <span class="sp-pref-sub">Animate AI chat responses</span>
           </span>
-          <div class="sp-toggle on" id="toggle-typewriter" onclick="togglePref('typewriter',this)">
-            <div class="sp-toggle-thumb"></div>
-          </div>
-        </label>
-        <label class="sp-toggle-row" title="Open note panel with single click">
+          <div class="sp-toggle on" id="toggle-typewriter"><div class="sp-toggle-thumb"></div></div>
+        </div>
+
+        <div class="sp-toggle-row" onclick="togglePref('clickOpen', document.getElementById('toggle-click-open'))">
           <span class="sp-toggle-label">
-            <span>Click to open</span>
+            <span>Auto-open on click</span>
             <span class="sp-pref-sub">Single click opens detail panel</span>
           </span>
-          <div class="sp-toggle on" id="toggle-click-open" onclick="togglePref('clickOpen',this)">
-            <div class="sp-toggle-thumb"></div>
-          </div>
-        </label>
+          <div class="sp-toggle on" id="toggle-click-open"><div class="sp-toggle-thumb"></div></div>
+        </div>
+
+        <div class="sp-toggle-row" onclick="togglePref('blur', document.getElementById('toggle-blur'))">
+          <span class="sp-toggle-label">
+            <span>Blur sensitive content</span>
+            <span class="sp-pref-sub">Hover to reveal note snippets</span>
+          </span>
+          <div class="sp-toggle" id="toggle-blur"><div class="sp-toggle-thumb"></div></div>
+        </div>
+
+        <div class="sp-toggle-row" onclick="togglePref('reduceMotion', document.getElementById('toggle-reduce-motion'))">
+          <span class="sp-toggle-label">
+            <span>Reduce motion</span>
+            <span class="sp-pref-sub">Disable animations</span>
+          </span>
+          <div class="sp-toggle" id="toggle-reduce-motion"><div class="sp-toggle-thumb"></div></div>
+        </div>
+
       </div>
 
       <div class="sp-divider"></div>
@@ -474,18 +627,17 @@
       <div class="sp-actions">
         <button class="sp-action-btn" onclick="exportNotes()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export notes (.json)
+          Export as JSON
         </button>
         <button class="sp-action-btn" onclick="exportNotesMd()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Export notes (.md)
+          Export as Markdown
         </button>
       </div>
 
       <div class="sp-divider"></div>
 
-      <!-- Sign out -->
-      <button class="sp-action-btn danger" onclick="logout(); closeSettings()">
+      <button class="sp-action-btn danger" style="width:100%" onclick="logout();closeSettings()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Sign out
       </button>
@@ -493,13 +645,106 @@
     </div>
   </div>
 
+  <!-- Chat Panel -->
+  <div id="chat-panel" class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Ask your notes
+      </div>
+      <button class="btn-icon" onclick="closeChat()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-input" type="text" placeholder="Ask anything about your notes..."
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"/>
+      <button class="chat-send-btn" onclick="sendChatMessage()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div id="edit-profile-overlay" class="ep-overlay hidden" onclick="closeEditProfile(event)">
+    <div class="ep-modal">
+      <div class="ep-header">
+        <div class="ep-title">Edit profile</div>
+        <button class="btn-icon" onclick="closeEditProfile()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="ep-body">
+
+        <!-- Avatar -->
+        <div class="ep-avatar-row">
+          <div class="ep-avatar-big" id="ep-avatar-big">B</div>
+          <div class="ep-avatar-info">
+            <div class="ep-avatar-name" id="ep-avatar-name">Username</div>
+            <div class="ep-avatar-sub">Avatar is generated from your initials</div>
+          </div>
+        </div>
+
+        <!-- Avatar color -->
+        <div class="ep-field-label">Avatar color</div>
+        <div class="sp-accent-row" id="ep-avatar-color-row">
+          <button class="sp-accent-btn active" data-avc="violet" onclick="setAvatarColor('violet',this)" style="--c:#7b68ee"><span></span></button>
+          <button class="sp-accent-btn" data-avc="blue"   onclick="setAvatarColor('blue',this)"   style="--c:#4f9cf9"><span></span></button>
+          <button class="sp-accent-btn" data-avc="teal"   onclick="setAvatarColor('teal',this)"   style="--c:#2dd4c4"><span></span></button>
+          <button class="sp-accent-btn" data-avc="green"  onclick="setAvatarColor('green',this)"  style="--c:#44d19a"><span></span></button>
+          <button class="sp-accent-btn" data-avc="rose"   onclick="setAvatarColor('rose',this)"   style="--c:#f472b6"><span></span></button>
+          <button class="sp-accent-btn" data-avc="orange" onclick="setAvatarColor('orange',this)" style="--c:#fb923c"><span></span></button>
+        </div>
+
+        <div class="sp-divider"></div>
+
+        <!-- Username -->
+        <div class="ep-field">
+          <label class="ep-field-label">Display name</label>
+          <input id="ep-username-input" type="text" class="ep-input" placeholder="Your username" maxlength="32"/>
+        </div>
+
+        <!-- Email -->
+        <div class="ep-field">
+          <label class="ep-field-label">Email</label>
+          <input id="ep-email-input" type="email" class="ep-input" placeholder="your@email.com"/>
+        </div>
+
+        <div class="sp-divider"></div>
+
+        <!-- Change password -->
+        <div class="ep-field-label" style="margin-bottom:8px">Change password</div>
+        <div class="ep-field">
+          <label class="ep-field-label">Current password</label>
+          <input id="ep-old-password" type="password" class="ep-input" placeholder="••••••••" autocomplete="current-password"/>
+        </div>
+        <div class="ep-field">
+          <label class="ep-field-label">New password</label>
+          <input id="ep-new-password" type="password" class="ep-input" placeholder="••••••••" autocomplete="new-password"/>
+        </div>
+        <div class="ep-field">
+          <label class="ep-field-label">Confirm new password</label>
+          <input id="ep-confirm-password" type="password" class="ep-input" placeholder="••••••••" autocomplete="new-password"/>
+        </div>
+
+        <p id="ep-error" class="error-text hidden"></p>
+        <p id="ep-success" class="ep-success hidden">Changes saved successfully ✓</p>
+
+      </div>
+      <div class="ep-footer">
+        <button class="btn btn-ghost" onclick="closeEditProfile()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProfile()">Save changes</button>
+      </div>
+    </div>
+  </div>
 </div><!-- /view-app -->
 
 <!-- Search Overlay -->
 <div id="search-overlay" class="search-overlay hidden" onclick="handleSearchOverlayClick(event)">
   <div class="search-modal">
     <div class="search-modal-input">
-      <span class="search-icon"></span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input
         id="search-input"
         type="text"
@@ -517,8 +762,10 @@
 </div>
 
 <!-- Toast -->
-<div id="toast" class="hidden">
-  <span class="spinner" id="toast-spinner" style="display:none"></span>
+<div id="toast">
+  <span class="spinner" id="toast-spinner" style="display:none">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+  </span>
   <span id="toast-text"></span>
 </div>
 
@@ -530,5 +777,6 @@
     navigator.serviceWorker.register("/static/sw.js").catch(() => {});
   }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
 </body>
 </html>
