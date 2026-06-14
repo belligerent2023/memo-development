@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MEMO</title>
+  <link rel="manifest" href="/static/manifest.json"/>
+  <meta name="theme-color" content="#7b68ee"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="MEMO"/>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+<!-- ── AUTH ─────────────────────────────────────────── -->
+<div id="view-auth">
+  <div class="auth-glow"></div>
+  <div class="auth-wrap">
+    <div class="auth-brand">
+      <div class="brand-mark">
+        <svg width="28" height="22" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 10,85 L 10,18 Q 10,12 16,12 L 22,12 Q 27,12 30,18 L 60,62 L 90,18 Q 93,12 98,12 L 104,12 Q 110,12 110,18 L 110,85"
+            stroke="white" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <h1>MEMO</h1>
+      <p id="auth-tagline">AI-powered second brain</p>
+    </div>
+    <div class="auth-card">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchAuthTab('login')">Sign in</button>
+        <button class="tab-btn" onclick="switchAuthTab('register')">Register</button>
+      </div>
+      <form id="form-login" onsubmit="handleLogin(event)">
+        <div class="field">
+          <label>Username</label>
+          <input id="login-username" type="text" autocomplete="username" required/>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input id="login-password" type="password" autocomplete="current-password" required/>
+        </div>
+        <p id="login-error" class="error-text hidden"></p>
+        <button type="submit" class="btn btn-primary auth-submit">Continue →</button>
+      </form>
+      <form id="form-register" class="hidden" onsubmit="handleRegister(event)">
+        <div class="field">
+          <label>Username</label>
+          <input id="reg-username" type="text" autocomplete="username" required/>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input id="reg-email" type="email" autocomplete="email" required/>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input id="reg-password" type="password" autocomplete="new-password" required/>
+        </div>
+        <div class="field">
+          <label id="lbl-lang">Interface language</label>
+          <div class="lang-grid" id="reg-lang-grid"></div>
+        </div>
+        <p id="reg-error" class="error-text hidden"></p>
+        <button type="submit" class="btn btn-primary auth-submit">Create account →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── APP ──────────────────────────────────────────── -->
+<div id="view-app">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-top">
+      <!-- Brand -->
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">
+          <svg width="20" height="16" viewBox="0 0 120 100" fill="none">
+            <path d="M 10,85 L 10,18 Q 10,12 16,12 L 22,12 Q 27,12 30,18 L 60,62 L 90,18 Q 93,12 98,12 L 104,12 Q 110,12 110,18 L 110,85"
+              stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <div class="sidebar-brand-copy">
+          <strong>MEMO</strong>
+          <span>Your think space</span>
+        </div>
+      </div>
+      <!-- Search -->
+      <button class="search-trigger" onclick="openSearch()">
+        <div class="search-trigger-left">
+          <span class="search-dot"></span>
+          <span id="sidebar-search-text">Search anything...</span>
+        </div>
+        <span class="kbd">Ctrl K</span>
+      </button>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-block">
+        <button id="nav-list" class="nav-item active" onclick="navigate('list')">
+          <span class="nav-icon"></span>
+          <span class="nav-label">All notes</span>
+        </button>
+        <button id="nav-canvas" class="nav-item" onclick="navigate('canvas')">
+          <span class="nav-icon"></span>
+          <span class="nav-label">Map</span>
+        </button>
+        <button class="nav-item" onclick="openChat()">
+          <span class="nav-icon"></span>
+          <span class="nav-label">Ask notes</span>
+        </button>
+        <button class="nav-item" onclick="openDailyReview()">
+          <span class="nav-icon"></span>
+          <span class="nav-label">Daily Review</span>
+        </button>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <div class="nav-section" id="nav-pinned-label">Pinned</div>
+      <div class="pinned-list" id="pinned-list"></div>
+
+      <div class="nav-divider"></div>
+
+      <div class="nav-section">Tags</div>
+      <div class="sidebar-tags" id="sidebar-tags"></div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="workspace-pill">
+        <div class="user-dot" id="user-avatar">?</div>
+        <div class="workspace-copy">
+          <span class="workspace-label">Workspace</span>
+          <span class="user-name" id="user-display"></span>
+        </div>
+      </div>
+      <button class="btn-icon btn-signout" onclick="logout()" title="Sign out"></button>
+    </div>
+  </nav>
+
+  <!-- App shell -->
+  <div class="app-shell">
+
+    <!-- Main content -->
+    <div class="content" id="main-content">
+
+      <!-- Topbar -->
+      <div class="topbar-v2">
+        <div class="topbar-left">
+          <div class="topbar-heading">
+            <span class="topbar-eyebrow">KNOWLEDGE BASE</span>
+            <span class="topbar-title" id="topbar-title" data-view="list">All notes</span>
+          </div>
+        </div>
+        <div class="topbar-center">
+          <button class="topbar-search topbar-search-wide" onclick="openSearch()">
+            <span class="search-icon"></span>
+            <span id="topbar-search-text">Search notes, tags, or connections...</span>
+            <span class="kbd" style="margin-left:auto">Ctrl K</span>
+          </button>
+        </div>
+        <div class="topbar-right">
+          <button id="new-note-btn" class="new-note-btn" onclick="toggleComposer(true)">
+            <span class="new-note-main">+ New note</span>
+            <span class="btn-sub">Ctrl Alt N</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Offline banner -->
+      <div id="offline-banner" class="offline-banner hidden">
+        ⚠ No connection to server
+      </div>
+
+      <!-- Filters bar -->
+      <div class="topbar-filters-v2" id="topbar-filters">
+        <div class="filters-row">
+          <button class="filter-chip active" data-filter="all"       onclick="setFilter('all',this)">All</button>
+          <button class="filter-chip"        data-filter="connected" onclick="setFilter('connected',this)">Connected</button>
+          <button class="filter-chip"        data-filter="recent"    onclick="setFilter('recent',this)">Recent</button>
+          <div class="filter-sep"></div>
+          <button class="date-chip" data-df="week"  onclick="setDateFilter('week')">This week</button>
+          <button class="date-chip" data-df="month" onclick="setDateFilter('month')">This month</button>
+          <button class="date-chip active" data-df="" onclick="setDateFilter(null)">All time</button>
+          <span id="tag-filter-indicator" class="date-chip hidden"
+            style="cursor:pointer;background:rgba(123,104,238,0.12);color:#cfc9f5;border-color:rgba(123,104,238,0.20)"></span>
+        </div>
+      </div>
+
+      <!-- Composer -->
+      <div id="composer-bar" class="composer-bar">
+        <div class="composer-card">
+          <textarea
+            id="note-input"
+            placeholder="Capture a thought... (any language)"
+            rows="3"
+            onkeydown="handleNoteKeydown(event)"
+          ></textarea>
+          <div class="composer-footer">
+            <span class="composer-hint">Ctrl+Enter to save · Esc to close</span>
+            <div class="composer-actions">
+              <button class="btn btn-ghost" onclick="toggleComposer(false)">Cancel</button>
+              <button id="btn-save" class="btn btn-primary" onclick="createNote()">Save note</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- List view -->
+      <div id="view-list" class="sub-view sub-view-list">
+        <div class="notes-board">
+          <div class="notes-board-head">
+            <div class="notes-grid-head">
+              <div>Title</div>
+              <div>Tags</div>
+              <div>Connections</div>
+              <div>Updated</div>
+            </div>
+          </div>
+          <div class="notes-board-body">
+            <table class="notes-table">
+              <tbody id="notes-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="load-more-wrap">
+          <button id="load-more-btn" class="btn btn-ghost hidden" onclick="loadMoreNotes()">
+            Load more
+          </button>
+        </div>
+      </div>
+
+      <!-- Canvas / Map view -->
+      <div id="view-canvas" class="sub-view hidden">
+        <div id="canvas-container">
+          <svg id="graph-svg"></svg>
+          <div class="graph-controls">
+            <button class="graph-ctrl-btn" title="Zoom in"
+              onclick="_graphTransform.scale=Math.min(4,_graphTransform.scale*1.25);_applyGraphTransform()">
+            </button>
+            <button class="graph-ctrl-btn" title="Reset view" onclick="resetGraph()"></button>
+            <button class="graph-ctrl-btn" title="Zoom out"
+              onclick="_graphTransform.scale=Math.max(0.2,_graphTransform.scale*0.8);_applyGraphTransform()">
+            </button>
+          </div>
+          <div class="graph-hint">Scroll to zoom · Drag to pan</div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+
+    <!-- ── NOTE DETAIL PANEL ──────────────────────────── -->
+    <div id="note-detail-panel" class="detail-pane hidden">
+      <div class="detail-pane-inner">
+
+        <!-- Header -->
+        <div class="detail-pane-header">
+          <div class="detail-pane-title-row">
+            <div class="detail-note-icon"></div>
+            <div class="detail-pane-title-wrap">
+              <h2 id="panel-title">Note</h2>
+              <div class="detail-pane-meta" id="panel-date"></div>
+            </div>
+          </div>
+          <div class="detail-pane-actions">
+            <button class="btn-icon detail-action-btn" id="pin-action-btn" onclick="togglePin()" title="Pin">
+              <span class="pin-slot"></span>
+            </button>
+            <button class="btn-icon detail-action-btn" id="panel-insight-trigger" title="AI insight" style="display:none">
+              <span class="spark-slot"></span>
+            </button>
+            <button class="btn-icon detail-action-btn" onclick="startEditingPanel()" title="Edit">
+              <span class="edit-slot"></span>
+            </button>
+            <button class="btn-icon detail-action-btn danger" onclick="deleteCurrentNote()" title="Delete">
+              <span class="trash-slot"></span>
+            </button>
+            <button class="btn-icon detail-close-mobile" onclick="closeNotePanel()" title="Close"></button>
+          </div>
+        </div>
+
+        <div class="detail-pane-scroll">
+
+          <!-- Tags -->
+          <div class="detail-pane-content">
+            <div class="detail-tags" id="panel-tags"></div>
+            <div class="note-panel-body" id="panel-body"></div>
+            <div id="panel-insight-slot"></div>
+          </div>
+
+          <!-- AI Summary -->
+          <div id="ai-summary-block" class="detail-pane-side" style="display:none">
+            <div class="detail-card">
+              <div class="detail-card-head">✦ AI Summary</div>
+              <div id="ai-summary-text" style="padding:0 14px 14px;color:var(--text-2);font-size:.88rem;line-height:1.65"></div>
+              <div style="display:flex;gap:8px;padding:0 10px 10px">
+                <button class="action-item" onclick="openChat()" style="flex:1">
+                  <span class="brain-slot" style="font-size:.9rem">🧠</span> Ask a follow-up
+                  <svg style="margin-left:auto" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button class="btn btn-ghost" id="copy-summary-btn" onclick="copySummary()" style="font-size:.78rem;min-height:36px;padding:0 12px">
+                  Copy summary
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connections -->
+          <div class="detail-pane-side">
+            <div class="detail-card" id="connections-section">
+              <div class="detail-card-head">🔗 Connections</div>
+              <div id="panel-connections" style="padding:0 10px 10px"></div>
+            </div>
+
+            <div class="detail-card">
+              <div class="detail-card-head">Related notes</div>
+              <div id="panel-similar" style="padding:0 10px 10px"></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="detail-card">
+              <div class="detail-card-head">Actions</div>
+              <div class="detail-action-list">
+                <button class="action-item" onclick="copyNoteLink()">
+                  <span class="copy-slot"></span> Copy note link
+                </button>
+                <button class="action-item" onclick="moveToTrash()" style="color:var(--red)">
+                  <span class="trash-slot"></span> Move to trash
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /detail-pane -->
+
+  </div><!-- /app-shell -->
+
+  <!-- Daily Review Modal -->
+  <div id="daily-review-modal" class="dr-overlay">
+    <div class="dr-modal">
+      <div class="dr-header">
+        <div>
+          <div class="dr-title">✦ Daily Review</div>
+          <div class="dr-subtitle" id="dr-subtitle"></div>
+        </div>
+        <button class="btn-icon dr-close-btn" onclick="closeDailyReview()" style="font-size:1.1rem"></button>
+      </div>
+      <div class="dr-body" id="dr-body">
+        <div class="dr-loading">Loading your memories...</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /view-app -->
+
+<!-- Search Overlay -->
+<div id="search-overlay" class="search-overlay hidden" onclick="handleSearchOverlayClick(event)">
+  <div class="search-modal">
+    <div class="search-modal-input">
+      <span class="search-icon"></span>
+      <input
+        id="search-input"
+        type="text"
+        placeholder="Search by meaning..."
+        oninput="debouncedSearch()"
+        onkeydown="handleSearchKey(event)"
+        autocomplete="off"
+      />
+      <span class="search-kbd">Esc</span>
+    </div>
+    <div id="search-results-list" class="search-results-list">
+      <div class="search-empty">Start typing to search semantically</div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden">
+  <span class="spinner" id="toast-spinner" style="display:none"></span>
+  <span id="toast-text"></span>
+</div>
+
+<script src="/static/i18n.js"></script>
+<script src="/static/editor.js"></script>
+<script src="/static/app.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/static/sw.js").catch(() => {});
+  }
+</script>
+</body>
+</html>
