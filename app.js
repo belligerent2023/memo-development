@@ -292,6 +292,9 @@ function bootApp(token, username) {
   hydrateIcons();
   applyI18n();
   navigate("list");
+  initAccent();
+  initFontSize();
+  initDensity();
   applyPrefs();
   loadNotes();
   apiFetch("/users/me")
@@ -1512,21 +1515,21 @@ function savePref() {
 }
 
 function togglePref(key, el) {
-  _prefs[key] = !_prefs[key];
-  el.classList.toggle("on", _prefs[key]);
+  el.classList.toggle("on");
+  _prefs[key] = el.classList.contains("on");
   savePref();
   applyPrefs();
 }
 
 function applyPrefs() {
-  // Snippets
   document.querySelectorAll(".note-row-snippet").forEach(el => {
     el.style.display = _prefs.snippets ? "" : "none";
   });
-  // Icons
   document.querySelectorAll(".note-type-icon").forEach(el => {
     el.style.display = _prefs.icons ? "" : "none";
   });
+  document.documentElement.dataset.prefBlur = _prefs.blur ? "1" : "0";
+  document.documentElement.dataset.prefReduceMotion = _prefs.reduceMotion ? "1" : "0";
 }
 
 function syncPrefToggles() {
@@ -1561,3 +1564,182 @@ async function exportNotesMd() {
     showToast(`Export failed: ${err.message}`, true, 3000);
   }
 }
+// ── ACCENT COLOR ────────────────────────────────────────────────────
+const ACCENTS = {
+  violet: { accent: "#7b68ee", accent2: "#8e7cf2" },
+  blue:   { accent: "#4f9cf9", accent2: "#6aadfb" },
+  teal:   { accent: "#2dd4c4", accent2: "#3de0cf" },
+  green:  { accent: "#44d19a", accent2: "#5adba8" },
+  rose:   { accent: "#f472b6", accent2: "#f687c0" },
+  orange: { accent: "#fb923c", accent2: "#fca454" },
+};
+
+function setAccent(name, el) {
+  const a = ACCENTS[name]; if (!a) return;
+  document.documentElement.style.setProperty("--accent",   a.accent);
+  document.documentElement.style.setProperty("--accent-2", a.accent2);
+  document.querySelectorAll(".sp-accent-btn").forEach(b => b.classList.remove("active"));
+  if (el) el.classList.add("active");
+  localStorage.setItem("memo_accent", name);
+  showToast(`Accent: ${name}`, true, 1200);
+}
+
+function initAccent() {
+  const saved = localStorage.getItem("memo_accent") || "violet";
+  const a = ACCENTS[saved]; if (!a) return;
+  document.documentElement.style.setProperty("--accent",   a.accent);
+  document.documentElement.style.setProperty("--accent-2", a.accent2);
+}
+
+// ── FONT SIZE ───────────────────────────────────────────────────────
+function setFontSize(size, el) {
+  document.documentElement.style.fontSize = `${size}px`;
+  document.querySelectorAll(".sp-size-btn").forEach(b => b.classList.remove("active"));
+  if (el) el.classList.add("active");
+  localStorage.setItem("memo_fontsize", size);
+}
+
+function initFontSize() {
+  const saved = localStorage.getItem("memo_fontsize");
+  if (saved) document.documentElement.style.fontSize = `${saved}px`;
+}
+
+// ── DENSITY ─────────────────────────────────────────────────────────
+function setDensity(d, el) {
+  document.documentElement.dataset.density = d;
+  document.querySelectorAll(".sp-density-btn").forEach(b => b.classList.remove("active"));
+  if (el) el.classList.add("active");
+  localStorage.setItem("memo_density", d);
+}
+
+function initDensity() {
+  const saved = localStorage.getItem("memo_density") || "normal";
+  document.documentElement.dataset.density = saved;
+}
+
+// ── SYNC SETTINGS STATE ─────────────────────────────────────────────
+function syncPrefToggles() {
+  const map = { snippets: "toggle-snippets", icons: "toggle-icons", typewriter: "toggle-typewriter", clickOpen: "toggle-click-open", blur: "toggle-blur", reduceMotion: "toggle-reduce-motion" };
+  Object.entries(map).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle("on", !!_prefs[key]);
+  });
+  // Accent
+  const savedAccent = localStorage.getItem("memo_accent") || "violet";
+  document.querySelectorAll(".sp-accent-btn").forEach(b => b.classList.toggle("active", b.dataset.accent === savedAccent));
+  // Font size
+  const savedSize = localStorage.getItem("memo_fontsize") || "14";
+  document.querySelectorAll(".sp-size-btn").forEach(b => b.classList.toggle("active", b.dataset.size === savedSize));
+  // Density
+  const savedDensity = localStorage.getItem("memo_density") || "normal";
+  document.querySelectorAll(".sp-density-btn").forEach(b => b.classList.toggle("active", b.dataset.density === savedDensity));
+}
+// ── EDIT PROFILE ─────────────────────────────────────────────────────
+const AVC_COLORS = {
+  violet: ["#7b68ee","#8e7cf2"],
+  blue:   ["#4f9cf9","#6aadfb"],
+  teal:   ["#2dd4c4","#3de0cf"],
+  green:  ["#44d19a","#5adba8"],
+  rose:   ["#f472b6","#f687c0"],
+  orange: ["#fb923c","#fca454"],
+};
+
+function openEditProfile() {
+  closeSettings();
+  const overlay = document.getElementById("edit-profile-overlay");
+  if (!overlay) return;
+
+  // Заполняем текущими данными
+  const username = _user?.username || "";
+  document.getElementById("ep-username-input").value = username;
+  document.getElementById("ep-email-input").value    = _user?.email || "";
+  document.getElementById("ep-avatar-big").textContent  = username.charAt(0).toUpperCase() || "?";
+  document.getElementById("ep-avatar-name").textContent = username;
+  document.getElementById("ep-old-password").value  = "";
+  document.getElementById("ep-new-password").value  = "";
+  document.getElementById("ep-confirm-password").value = "";
+  document.getElementById("ep-error").classList.add("hidden");
+  document.getElementById("ep-success").classList.add("hidden");
+
+  // Цвет аватара
+  const savedAvc = localStorage.getItem("memo_avatar_color") || "violet";
+  document.querySelectorAll("#ep-avatar-color-row .sp-accent-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.avc === savedAvc);
+  });
+  applyAvatarColor(savedAvc);
+
+  overlay.classList.remove("hidden");
+  setTimeout(() => overlay.querySelector(".ep-modal")?.classList.add("open"), 10);
+}
+
+function closeEditProfile(e) {
+  if (e && e.target !== document.getElementById("edit-profile-overlay")) return;
+  const overlay = document.getElementById("edit-profile-overlay");
+  overlay?.querySelector(".ep-modal")?.classList.remove("open");
+  setTimeout(() => overlay?.classList.add("hidden"), 180);
+}
+
+function setAvatarColor(name, el) {
+  document.querySelectorAll("#ep-avatar-color-row .sp-accent-btn").forEach(b => b.classList.remove("active"));
+  if (el) el.classList.add("active");
+  localStorage.setItem("memo_avatar_color", name);
+  applyAvatarColor(name);
+}
+
+function applyAvatarColor(name) {
+  const colors = AVC_COLORS[name] || AVC_COLORS.violet;
+  const avatars = document.querySelectorAll(".user-dot, .sp-avatar, #ep-avatar-big");
+  avatars.forEach(a => {
+    a.style.background = `linear-gradient(135deg, ${colors[0]}, ${colors[1]})`;
+  });
+}
+
+async function saveProfile() {
+  const errEl     = document.getElementById("ep-error");
+  const successEl = document.getElementById("ep-success");
+  errEl.classList.add("hidden");
+  successEl.classList.add("hidden");
+
+  const newUsername = document.getElementById("ep-username-input").value.trim();
+  const newEmail    = document.getElementById("ep-email-input").value.trim();
+  const oldPass     = document.getElementById("ep-old-password").value;
+  const newPass     = document.getElementById("ep-new-password").value;
+  const confirmPass = document.getElementById("ep-confirm-password").value;
+
+  if (!newUsername) {
+    errEl.textContent = "Username cannot be empty"; errEl.classList.remove("hidden"); return;
+  }
+  if (newPass && newPass !== confirmPass) {
+    errEl.textContent = "Passwords do not match"; errEl.classList.remove("hidden"); return;
+  }
+  if (newPass && !oldPass) {
+    errEl.textContent = "Enter current password to change it"; errEl.classList.remove("hidden"); return;
+  }
+
+  try {
+    const payload = { username: newUsername, email: newEmail };
+    if (newPass) { payload.old_password = oldPass; payload.new_password = newPass; }
+
+    await apiFetch("/users/me", { method: "PATCH", body: JSON.stringify(payload) });
+
+    // Обновляем UI
+    if (_user) { _user.username = newUsername; _user.email = newEmail; }
+    document.getElementById("user-display").textContent = newUsername;
+    document.getElementById("user-avatar").textContent  = newUsername.charAt(0).toUpperCase();
+    document.getElementById("sp-avatar").textContent    = newUsername.charAt(0).toUpperCase();
+    document.getElementById("ep-avatar-big").textContent  = newUsername.charAt(0).toUpperCase();
+    document.getElementById("ep-avatar-name").textContent = newUsername;
+
+    successEl.classList.remove("hidden");
+    setTimeout(() => closeEditProfile(), 1200);
+  } catch (err) {
+    errEl.textContent = err.message || "Failed to save changes";
+    errEl.classList.remove("hidden");
+  }
+}
+
+// Применяем цвет аватара при старте
+(function initAvatarColor() {
+  const saved = localStorage.getItem("memo_avatar_color") || "violet";
+  applyAvatarColor(saved);
+})();
