@@ -108,6 +108,40 @@ function escHtml(s) {
     .replace(/>/g, "&gt;");
 }
 
+function sanitizeHtml(html) {
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html;
+  tmp.querySelectorAll("script,style,iframe,object,embed").forEach(el => el.remove());
+  tmp.querySelectorAll("*").forEach(el => {
+    [...el.attributes].forEach(attr => {
+      if (attr.name.startsWith("on")) el.removeAttribute(attr.name);
+    });
+  });
+  return tmp.innerHTML;
+}
+
+function renderNoteBody(note, targetEl) {
+  const body = targetEl || document.getElementById("panel-body");
+  if (!body) return;
+
+  if (note.html_content && note.html_content.trim()) {
+    body.innerHTML = sanitizeHtml(note.html_content);
+    return;
+  }
+
+  if (note.content && note.content.trim()) {
+    if (typeof marked !== "undefined") {
+      marked.setOptions({ breaks: true, gfm: true });
+      body.innerHTML = sanitizeHtml(marked.parse(note.content));
+    } else {
+      body.innerHTML = `<p>${escHtml(note.content).replace(/\n/g, "<br>")}</p>`;
+    }
+    return;
+  }
+
+  body.innerHTML = `<p class="empty-note-hint">Empty note</p>`;
+}
+
 function formatTime(iso) {
   const d = new Date(iso);
   const now = new Date();
@@ -610,10 +644,16 @@ function renderTable() {
   const visibleNotes = getFilteredNotes();
 
   if (!visibleNotes.length) {
-    const msg = _tagFilter
-      ? `No notes tagged "${escHtml(_tagFilter)}"`
-      : t("no_notes_yet", "No notes yet — click New note to start");
-    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state">${icon("empty")}<p>${msg}</p></div></td></tr>`;
+    tbody.innerHTML = "";
+    // Если фильтр по тегу — показываем текст внутри таблицы, кот не нужен
+    if (_tagFilter) {
+      tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state-inline">
+        <p>No notes tagged "<strong>${escHtml(_tagFilter)}</strong>"
+        <button class="btn btn-ghost" style="margin-left:8px;font-size:.78rem;min-height:28px;padding:0 10px"
+          onclick="filterByTag(null)">Clear filter</button></p>
+      </div></td></tr>`;
+    }
+    updateEmptyState();
     return;
   }
 
@@ -648,6 +688,8 @@ function renderTable() {
       <td class="td-date">${formatTime(note.created_at)}</td>
     </tr>`;
   }).join("");
+
+  updateEmptyState();
 }
 
 // ── RENDER PINNED & SIDEBAR TAGS ─────────────────────────────────────
@@ -740,9 +782,7 @@ async function openNote(noteId) {
   }
 
   if (body) {
-    body.innerHTML = note.html_content
-      ? `<div class="panel-content-view">${note.html_content}</div>`
-      : `<div class="panel-content-view">${escHtml(note.content).replace(/\n/g, "<br>")}</div>`;
+    renderNoteBody(note, body);
   }
 
   if (insightSlot) insightSlot.innerHTML = "";
@@ -1782,3 +1822,36 @@ async function saveProfile() {
   const saved = localStorage.getItem("memo_avatar_color") || "violet";
   applyAvatarColor(saved);
 })();
+// ── EMPTY STATE ──────────────────────────────────────────────────────
+function updateEmptyState() {
+  const wrap = document.getElementById("memo-cat-wrap");
+  const tbody = document.getElementById("notes-tbody");
+  if (!wrap) return;
+
+  const hasNotes = _notes && _notes.length > 0;
+  wrap.style.display = hasNotes ? "none" : "";
+
+  // Если нет заметок — tbody тоже чистим
+  if (!hasNotes && tbody) {
+    tbody.innerHTML = "";
+  }
+}
+
+// Easter egg — кликнуть на кота
+document.addEventListener("DOMContentLoaded", () => {
+  const wrap = document.querySelector(".memo-cat-wrap");
+  if (!wrap) return;
+  wrap.addEventListener("click", () => {
+    wrap.classList.remove("poked");
+    void wrap.offsetWidth; // reflow
+    wrap.classList.add("poked");
+
+    // Случайная фраза
+    const phrases = [
+      "Meow! 🐱", "Purrrr...", "Stop poking me!", "I'm thinking...", "*knocks note off table*"
+    ];
+    showToast(phrases[Math.floor(Math.random() * phrases.length)], true, 1500);
+
+    setTimeout(() => wrap.classList.remove("poked"), 500);
+  });
+});
