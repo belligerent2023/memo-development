@@ -654,14 +654,14 @@ function renderTable() {
 function renderPinned() {
   const el = document.getElementById("pinned-list");
   if (!el) return;
-  const items = _notes.slice(0, 6);
+  const pinned = _notes.filter(n => n.is_pinned);
+  const items  = pinned.length ? pinned : _notes.slice(0, 5);
   el.innerHTML = items.map(note => {
     const type = getNoteType(note);
-    return `<button class="pinned-note${String(note.id) === String(_currentNoteId) ? " active" : ""}"
-      onclick="openNote(${JSON.stringify(note.id)})">
-      <span class="pinned-note-icon" style="color:${type.color}">${icon(type.icon)}</span>
+    return `<div class="pinned-note${note.is_pinned ? " pinned" : ""}" onclick="openNote('${note.id}')">
+      <span class="pinned-note-icon">${icon(type.icon)}</span>
       <span class="pinned-note-title">${escHtml(clampText(noteTitle(note), 30))}</span>
-    </button>`;
+    </div>`;
   }).join("");
   renderSidebarTags();
 }
@@ -689,9 +689,24 @@ function setPinState(pinned) {
   if (headerBtn) headerBtn.innerHTML = pinned ? icon("pinOff") : icon("pin");
 }
 
-function togglePin() {
-  const current = document.getElementById("pin-label")?.textContent.includes("Un-pin");
-  setPinState(!current);
+async function togglePin() {
+  if (!_currentNoteId) return;
+  const note = findNote(_currentNoteId);
+  if (!note) return;
+
+  const newPinned = !note.is_pinned;
+  try {
+    await apiFetch(`/notes/${_currentNoteId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ is_pinned: newPinned })
+    });
+    note.is_pinned = newPinned;
+    setPinState(newPinned);
+    renderPinned();
+    showToast(newPinned ? "Note pinned" : "Note unpinned", true, 1500);
+  } catch (err) {
+    showToast(`Error: ${err.message}`, true, 2500);
+  }
 }
 
 // ── NOTE DETAIL PANEL ────────────────────────────────────────────────
@@ -739,7 +754,7 @@ async function openNote(noteId) {
   if (aiText)  aiText.innerHTML = "";
   window._lastSummary = "";
 
-  setPinState(false);
+  setPinState(!!note.is_pinned);
 
   // Load connections
   let connections = [];
@@ -825,7 +840,10 @@ function closeNotePanel() {
   renderPinned();
 }
 
-function startEditingPanel() { if (_currentNoteId) startEditing(_currentNoteId); }
+function startEditingPanel() {
+  if (!_currentNoteId) return;
+  startEditing(_currentNoteId);
+}
 function moveToTrash() { deleteCurrentNote(); }
 
 function copyNoteLink() {
@@ -890,77 +908,98 @@ async function generateInsightPanel(sourceId, relatedIds) {
 function startEditing(noteId) {
   const note = findNote(noteId);
   if (!note) return;
+
   const body = document.getElementById("panel-body");
-  const insightSlot = document.getElementById("panel-insight-slot");
-  if (insightSlot) insightSlot.innerHTML = "";
-  const L = window._lang || "en";
-  const lb = { en: { cancel: "Cancel", save: "Save", hint: "Type / for commands" },
-               ru: { cancel: "Отмена", save: "Сохранить", hint: "Введите / для команд" } }[L] || { cancel: "Cancel", save: "Save", hint: "" };
-  body.innerHTML = `
-    <div class="editor-toolbar">
-      <button onclick="document.execCommand('bold')" title="Bold"><strong>B</strong></button>
-      <button onclick="document.execCommand('italic')" title="Italic"><em>I</em></button>
-      <button onclick="document.execCommand('underline')" title="Underline"><u>U</u></button>
-      <span class="toolbar-sep"></span>
-      <button onclick="document.execCommand('formatBlock','',\'h2\')" title="H1">H1</button>
-      <button onclick="document.execCommand('formatBlock','',\'h3\')" title="H2">H2</button>
-      <button onclick="document.execCommand('insertUnorderedList')" title="List">UL</button>
-    </div>
-    <div id="editor-mount"></div>
-    <div class="editor-footer">
-      <span class="editor-hint">${lb.hint}</span>
-      <div class="editor-actions">
-        <button class="btn btn-ghost" onclick="cancelEdit(${JSON.stringify(noteId)})">${lb.cancel}</button>
-        <button class="btn btn-primary" onclick="saveEdit(${JSON.stringify(noteId)})">${lb.save}</button>
-      </div>
-    </div>`;
+  if (!body) return;
+
+  // Сохраняем оригинал для Cancel
+  body.dataset.originalHtml    = body.innerHTML;
+  body.dataset.editingNoteId   = String(noteId);
+
+  // Уничтожаем старый редактор если был
   if (_activeEditor) { _activeEditor.destroy(); _activeEditor = null; }
+
+  // Монтируем MemoEditor
+  body.innerHTML = `
+    <div id="editor-mount" class="editor-mount"></div>
+    <div class="editor-footer">
+      <span class="composer-hint">Ctrl+Enter to save · Esc to cancel</span>
+      <div class="composer-actions">
+        <button class="btn btn-ghost" id="cancel-edit-btn">Cancel</button>
+        <button class="btn btn-primary" id="save-edit-btn">Save</button>
+      </div>
+    </div>
+  `;
+
   const mount = document.getElementById("editor-mount");
-  if (typeof MemoEditor !== "undefined" && mount) {
-    _activeEditor = new MemoEditor(mount, {
-      initialHtml: note.html_content || `<p>${escHtml(note.content)}</p>`,
-      onChange: () => {}
-    });
-    window._memoEditor = _activeEditor;
-    window.editor = _activeEditor;
-    _activeEditor.focus();
-  } else if (mount) {
-    mount.innerHTML = `<textarea id="edit-textarea" style="width:100%;min-height:300px;background:transparent;border:none;color:var(--text);padding:0;font-size:.95rem;font-family:var(--font);resize:none;outline:none;line-height:1.75">${escHtml(note.content)}</textarea>`;
-    document.getElementById("edit-textarea")?.focus();
-  }
+  _activeEditor = new MemoEditor(mount, {
+    initialHtml: note.html_content || `<p>${escHtml(note.content || "")}</p>`,
+    onChange: () => {}
+  });
+  window._memoEditor = _activeEditor;
+  _activeEditor.focus();
+
+  // Обработчики кнопок
+  document.getElementById("cancel-edit-btn")
+    .addEventListener("click", () => cancelEdit(noteId));
+  document.getElementById("save-edit-btn")
+    .addEventListener("click", () => saveEdit(noteId));
+
+  // Ctrl+Enter / Esc
+  mount.addEventListener("keydown", e => {
+    if (e.ctrlKey && e.key === "Enter") { e.preventDefault(); saveEdit(noteId); }
+    if (e.key === "Escape") { e.preventDefault(); cancelEdit(noteId); }
+  }, true);
 }
 
 async function saveEdit(noteId) {
-  let plainText = "", htmlContent = null;
-  if (_activeEditor) {
-    plainText = (_activeEditor.getPlainText() || "").trim();
-    htmlContent = _activeEditor.getHTML();
-  } else {
-    const ta = document.getElementById("edit-textarea");
-    if (!ta) return;
-    plainText = ta.value.trim();
-  }
-  if (!plainText) return;
-  showToast(t("saving", "Saving..."), false);
+  if (!_activeEditor) return;
+
+  const htmlContent = _activeEditor.getHTML().trim();
+  const plainText   = _activeEditor.getPlainText().trim();
+  if (!plainText) { showToast("Note is empty", true, 1500); return; }
+
+  showToast("Saving...", false);
   try {
     const updated = await apiFetch(`/notes/${noteId}`, {
       method: "PATCH",
       body: JSON.stringify({ content: plainText, html_content: htmlContent })
     });
+
     const idx = _notes.findIndex(n => String(n.id) === String(noteId));
     if (idx !== -1) {
-      _notes[idx] = normalizeNote({ ..._notes[idx], ...updated, id: noteId, content: plainText, html_content: htmlContent ?? _notes[idx].html_content });
+      _notes[idx] = {
+        ..._notes[idx],
+        ...updated,
+        id: noteId,
+        content: plainText,
+        html_content: htmlContent
+      };
     }
+
     if (_activeEditor) { _activeEditor.destroy(); _activeEditor = null; }
+    window._memoEditor = null;
     hideToast();
-    showToast(t("note_saved", "Note saved"), true, 2000);
-    renderTable(); renderPinned(); openNote(noteId);
-  } catch (err) { showToast(`Error: ${err.message}`, true, 3000); }
+    showToast("Saved ✓", true, 1800);
+    renderTable();
+    renderPinned();
+    openNote(noteId);
+  } catch (err) {
+    showToast(`Error: ${err.message}`, true, 3000);
+  }
 }
 
 function cancelEdit(noteId) {
+  const body = document.getElementById("panel-body");
   if (_activeEditor) { _activeEditor.destroy(); _activeEditor = null; }
-  openNote(noteId);
+  window._memoEditor = null;
+  if (body?.dataset.originalHtml !== undefined) {
+    body.innerHTML = body.dataset.originalHtml;
+    delete body.dataset.originalHtml;
+    delete body.dataset.editingNoteId;
+  } else {
+    openNote(noteId);
+  }
 }
 
 // ── GRAPH ────────────────────────────────────────────────────────────
