@@ -16,17 +16,13 @@
 </head>
 <body>
 
-
 <!-- ── AUTH ─────────────────────────────────────────── -->
 <div id="view-auth">
   <div class="auth-glow"></div>
   <div class="auth-wrap">
     <div class="auth-brand">
       <div class="brand-mark">
-        <svg width="28" height="22" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 10,85 L 10,18 Q 10,12 16,12 L 22,12 Q 27,12 30,18 L 60,62 L 90,18 Q 93,12 98,12 L 104,12 Q 110,12 110,18 L 110,85"
-            stroke="white" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
+        <img src="/static/logo.png" alt="MEMO logo" class="auth-logo-img">
       </div>
       <h1>MEMO</h1>
       <p id="auth-tagline">AI-powered second brain</p>
@@ -37,30 +33,20 @@
         <button class="tab-btn" onclick="switchAuthTab('register')">Register</button>
       </div>
       <form id="form-login" onsubmit="handleLogin(event)">
-        <div class="field">
-          <label>Username</label>
-          <input id="login-username" type="text" autocomplete="username" required/>
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <input id="login-password" type="password" autocomplete="current-password" required/>
-        </div>
+        <div class="field"><label>Username</label>
+          <input id="login-username" type="text" autocomplete="username" required/></div>
+        <div class="field"><label>Password</label>
+          <input id="login-password" type="password" autocomplete="current-password" required/></div>
         <p id="login-error" class="error-text hidden"></p>
         <button type="submit" class="btn btn-primary auth-submit">Continue →</button>
       </form>
       <form id="form-register" class="hidden" onsubmit="handleRegister(event)">
-        <div class="field">
-          <label>Username</label>
-          <input id="reg-username" type="text" autocomplete="username" required/>
-        </div>
-        <div class="field">
-          <label>Email</label>
-          <input id="reg-email" type="email" autocomplete="email" required/>
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <input id="reg-password" type="password" autocomplete="new-password" required/>
-        </div>
+        <div class="field"><label>Username</label>
+          <input id="reg-username" type="text" autocomplete="username" required/></div>
+        <div class="field"><label>Email</label>
+          <input id="reg-email" type="email" autocomplete="email" required/></div>
+        <div class="field"><label>Password</label>
+          <input id="reg-password" type="password" autocomplete="new-password" required/></div>
         <div class="field">
           <label id="lbl-lang">Interface language</label>
           <div class="lang-grid" id="reg-lang-grid"></div>
@@ -72,27 +58,21 @@
   </div>
 </div>
 
-
 <!-- ── APP ──────────────────────────────────────────── -->
 <div id="view-app">
 
   <!-- Sidebar -->
   <nav class="sidebar">
     <div class="sidebar-top">
-      <!-- Brand -->
       <div class="sidebar-brand">
         <div class="sidebar-logo">
-          <svg width="20" height="16" viewBox="0 0 120 100" fill="none">
-            <path d="M 10,85 L 10,18 Q 10,12 16,12 L 22,12 Q 27,12 30,18 L 60,62 L 90,18 Q 93,12 98,12 L 104,12 Q 110,12 110,18 L 110,85"
-              stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          </svg>
+          <img src="/static/logo.png" alt="MEMO" class="sidebar-logo-img">
         </div>
         <div class="sidebar-brand-copy">
           <strong>MEMO</strong>
           <span>Your think space</span>
         </div>
       </div>
-      <!-- Search -->
       <button class="search-trigger" onclick="openSearch()">
         <div class="search-trigger-left">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -131,12 +111,9 @@
       </div>
 
       <div class="nav-divider"></div>
-
       <div class="nav-section" id="nav-pinned-label">Pinned</div>
       <div class="pinned-list" id="pinned-list"></div>
-
       <div class="nav-divider"></div>
-
       <div class="nav-section">Tags</div>
       <div class="sidebar-tags" id="sidebar-tags"></div>
     </div>
@@ -158,16 +135,19 @@
 
   <!-- App shell -->
   <div class="app-shell">
-
-    <!-- Main content -->
     <div class="content" id="main-content">
 
       <!-- Topbar -->
       <div class="topbar-v2">
         <div class="topbar-left">
           <div class="topbar-heading">
-            <span class="topbar-eyebrow">KNOWLEDGE BASE</span>
-            <span class="topbar-title" id="topbar-title" data-view="list">All notes</span>
+            <div class="topbar-logo">
+              <img src="/static/logo.png" alt="MEMO" class="topbar-logo-img">
+            </div>
+            <div class="topbar-heading-text">
+              <span class="topbar-eyebrow">KNOWLEDGE BASE</span>
+              <span class="topbar-title" id="topbar-title" data-view="list">All notes</span>
+            </div>
           </div>
         </div>
         <div class="topbar-center">
@@ -186,11 +166,9 @@
       </div>
 
       <!-- Offline banner -->
-      <div id="offline-banner" class="offline-banner hidden">
-        ⚠ No connection to server
-      </div>
+      <div id="offline-banner" class="offline-banner hidden">⚠ No connection to server</div>
 
-      <!-- Filters bar -->
+      <!-- Filters -->
       <div class="topbar-filters-v2" id="topbar-filters">
         <div class="filters-row">
           <button class="filter-chip active" data-filter="all"       onclick="setFilter('all',this)">All</button>
@@ -208,12 +186,8 @@
       <!-- Composer -->
       <div id="composer-bar" class="composer-bar">
         <div class="composer-card">
-          <textarea
-            id="note-input"
-            placeholder="Capture a thought... (any language)"
-            rows="3"
-            onkeydown="handleNoteKeydown(event)"
-          ></textarea>
+          <textarea id="note-input" placeholder="Capture a thought... (any language)" rows="3"
+            onkeydown="handleNoteKeydown(event)"></textarea>
           <div class="composer-footer">
             <span class="composer-hint">Ctrl+Enter to save · Esc to close</span>
             <div class="composer-actions">
@@ -226,6 +200,98 @@
 
       <!-- List view -->
       <div id="view-list" class="sub-view sub-view-list">
+
+        <!-- ── EMPTY STATE ── -->
+        <div id="empty-state" class="empty-state hidden">
+          <div class="memo-cat-wrap" id="memo-cat-wrap">
+            <svg class="memo-cat" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+
+              <!-- Хвост -->
+              <path class="cat-tail"
+                d="M 95 130 Q 130 120 138 100 Q 145 80 128 72"
+                stroke="var(--accent)" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+              <!-- Тело -->
+              <ellipse cx="80" cy="118" rx="38" ry="28" fill="var(--accent)" opacity="0.20"/>
+              <ellipse cx="80" cy="114" rx="35" ry="26" fill="var(--accent)" opacity="0.30"/>
+
+              <!-- Голова -->
+              <circle cx="80" cy="76" r="30" fill="var(--accent)" opacity="0.92"/>
+
+              <!-- Уши -->
+              <polygon points="56,58 46,32 68,52" fill="var(--accent)"/>
+              <polygon points="104,58 114,32 92,52" fill="var(--accent)"/>
+              <!-- Внутри ушей -->
+              <polygon points="57,56 50,36 66,51" fill="white" opacity="0.20"/>
+              <polygon points="103,56 110,36 94,51" fill="white" opacity="0.20"/>
+
+              <!-- Глаза -->
+              <ellipse class="cat-eye-left"  cx="68" cy="74" rx="5.5" ry="6" fill="#12141f"/>
+              <ellipse class="cat-eye-right" cx="92" cy="74" rx="5.5" ry="6" fill="#12141f"/>
+              <!-- Блики -->
+              <circle cx="70" cy="72" r="1.8" fill="white"/>
+              <circle cx="94" cy="72" r="1.8" fill="white"/>
+
+              <!-- Нос -->
+              <ellipse cx="80" cy="84" rx="3" ry="2.2" fill="#12141f" opacity="0.65"/>
+
+              <!-- Рот -->
+              <path d="M 76 87 Q 80 92 84 87"
+                stroke="#12141f" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.45"/>
+
+              <!-- Усы левые -->
+              <line x1="76" y1="84" x2="52" y2="80" stroke="#12141f" stroke-width="1.2" opacity="0.30" stroke-linecap="round"/>
+              <line x1="76" y1="86" x2="52" y2="89" stroke="#12141f" stroke-width="1.2" opacity="0.30" stroke-linecap="round"/>
+              <!-- Усы правые -->
+              <line x1="84" y1="84" x2="108" y2="80" stroke="#12141f" stroke-width="1.2" opacity="0.30" stroke-linecap="round"/>
+              <line x1="84" y1="86" x2="108" y2="89" stroke="#12141f" stroke-width="1.2" opacity="0.30" stroke-linecap="round"/>
+
+              <!-- Лапки -->
+              <ellipse cx="60" cy="138" rx="14" ry="10" fill="var(--accent)" opacity="0.85"/>
+              <ellipse cx="100" cy="138" rx="14" ry="10" fill="var(--accent)" opacity="0.85"/>
+              <!-- Пальчики -->
+              <ellipse cx="53" cy="141" rx="4" ry="3" fill="var(--accent-2)" opacity="0.50"/>
+              <ellipse cx="61" cy="143" rx="4" ry="3" fill="var(--accent-2)" opacity="0.50"/>
+              <ellipse cx="69" cy="141" rx="4" ry="3" fill="var(--accent-2)" opacity="0.50"/>
+              <ellipse cx="93" cy="141" rx="4" ry="3" fill="var(--accent-2)" opacity="0.50"/>
+              <ellipse cx="101" cy="143" rx="4" ry="3" fill="var(--accent-2)" opacity="0.50"/>
+              <ellipse cx="109" cy="141" rx="4" ry="3" fill="var(--accent-2)" opacity="0.50"/>
+
+              <!-- Лапка тянется к клубку — часть тела, не отдельный элемент -->
+              <g class="cat-paw-anim">
+                <path d="M 100 128 Q 118 118 130 128"
+                  stroke="var(--accent)" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.88"/>
+                <ellipse cx="132" cy="130" rx="9" ry="8" fill="var(--accent)" opacity="0.88"/>
+                <!-- Пальчики на тянущейся лапке -->
+                <ellipse cx="126" cy="136" rx="3.5" ry="2.5" fill="var(--accent-2)" opacity="0.45"/>
+                <ellipse cx="133" cy="138" rx="3.5" ry="2.5" fill="var(--accent-2)" opacity="0.45"/>
+                <ellipse cx="140" cy="135" rx="3.5" ry="2.5" fill="var(--accent-2)" opacity="0.45"/>
+              </g>
+
+              <!-- Клубок -->
+              <g class="cat-yarn">
+                <circle cx="148" cy="125" r="13" fill="none" stroke="#f472b6" stroke-width="3" opacity="0.75"/>
+                <circle cx="148" cy="125" r="9"  fill="none" stroke="#f472b6" stroke-width="2" opacity="0.55"/>
+                <circle cx="148" cy="125" r="5"  fill="#f472b6" opacity="0.35"/>
+                <!-- Нитка от клубка к лапке -->
+                <path d="M 140 118 Q 128 108 118 118"
+                  stroke="#f472b6" stroke-width="1.8" fill="none" stroke-dasharray="4,3"
+                  stroke-linecap="round" opacity="0.55"/>
+              </g>
+
+            </svg>
+          </div>
+
+          <div class="empty-state-text">
+            <h3 class="empty-title">Nothing here yet</h3>
+            <p class="empty-sub">Memo Cat is waiting for your first thought.<br>Capture something — an idea, a task, a quote.</p>
+            <button class="btn btn-primary empty-cta" onclick="toggleComposer(true)">
+              + Create first note
+            </button>
+          </div>
+        </div>
+
+        <!-- Notes board -->
         <div class="notes-board">
           <div class="notes-board-head">
             <div class="notes-grid-head">
@@ -239,68 +305,9 @@
             <table class="notes-table">
               <tbody id="notes-tbody"></tbody>
             </table>
-            <!-- Empty State -->
-            <div id="empty-state" class="empty-state hidden">
-              <div class="memo-cat-wrap">
-                <svg class="memo-cat" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                  <!-- Хвост -->
-                  <path class="cat-tail" d="M 68 95 Q 90 90 95 75 Q 100 60 88 58" stroke="var(--accent)" stroke-width="4" fill="none" stroke-linecap="round"/>
-                  <!-- Тело -->
-                  <ellipse cx="55" cy="88" rx="28" ry="22" fill="var(--accent)" opacity="0.15"/>
-                  <ellipse cx="55" cy="86" rx="26" ry="20" fill="var(--accent)" opacity="0.25"/>
-                  <!-- Голова -->
-                  <circle cx="55" cy="58" r="22" fill="var(--accent)" opacity="0.9"/>
-                  <!-- Уши -->
-                  <polygon points="36,42 30,24 46,36" fill="var(--accent)"/>
-                  <polygon points="74,42 80,24 64,36" fill="var(--accent)"/>
-                  <!-- Внутри ушей -->
-                  <polygon points="37,40 33,28 44,37" fill="var(--accent-2)" opacity="0.5"/>
-                  <polygon points="73,40 77,28 66,37" fill="var(--accent-2)" opacity="0.5"/>
-                  <!-- Глаза -->
-                  <ellipse class="cat-eye-left"  cx="47" cy="56" rx="4" ry="4.5" fill="#1a1d2e"/>
-                  <ellipse class="cat-eye-right" cx="63" cy="56" rx="4" ry="4.5" fill="#1a1d2e"/>
-                  <!-- Блики в глазах -->
-                  <circle cx="48.5" cy="54.5" r="1.2" fill="white"/>
-                  <circle cx="64.5" cy="54.5" r="1.2" fill="white"/>
-                  <!-- Нос -->
-                  <ellipse cx="55" cy="63" rx="2.5" ry="1.8" fill="#1a1d2e" opacity="0.7"/>
-                  <!-- Усы левые -->
-                  <line x1="52" y1="63" x2="35" y2="60" stroke="#1a1d2e" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
-                  <line x1="52" y1="64" x2="35" y2="66" stroke="#1a1d2e" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
-                  <!-- Усы правые -->
-                  <line x1="58" y1="63" x2="75" y2="60" stroke="#1a1d2e" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
-                  <line x1="58" y1="64" x2="75" y2="66" stroke="#1a1d2e" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
-                  <!-- Рот -->
-                  <path d="M 52 66 Q 55 70 58 66" stroke="#1a1d2e" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.5"/>
-                  <!-- Лапки -->
-                  <ellipse cx="40" cy="104" rx="10" ry="7" fill="var(--accent)" opacity="0.85"/>
-                  <ellipse cx="70" cy="104" rx="10" ry="7" fill="var(--accent)" opacity="0.85"/>
-                  <!-- Клубок -->
-                  <g class="cat-yarn">
-                    <circle cx="85" cy="100" r="10" fill="none" stroke="#f472b6" stroke-width="2.5" opacity="0.8"/>
-                    <circle cx="85" cy="100" r="7"  fill="none" stroke="#f472b6" stroke-width="1.5" opacity="0.6"/>
-                    <circle cx="85" cy="100" r="4"  fill="#f472b6" opacity="0.4"/>
-                    <line x1="68" y1="63" x2="77" y2="92" stroke="#f472b6" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.6"/>
-                  </g>
-                </svg>
-
-                <!-- Лапка тянется к клубку -->
-                <svg class="cat-paw-reach" viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M 5 25 Q 20 10 40 15 Q 50 17 55 22" stroke="var(--accent)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.85"/>
-                  <ellipse cx="55" cy="23" rx="6" ry="5" fill="var(--accent)" opacity="0.85"/>
-                </svg>
-              </div>
-
-              <div class="empty-state-text">
-                <h3 class="empty-title">Nothing here yet</h3>
-                <p class="empty-sub">Memo Cat is waiting for your first thought.<br>Capture something — an idea, a task, a quote.</p>
-                <button class="btn btn-primary empty-cta" onclick="toggleComposer(true)">
-                  + Create first note
-                </button>
-              </div>
-            </div>
           </div>
         </div>
+
         <div class="load-more-wrap">
           <button id="load-more-btn" class="btn btn-ghost hidden" onclick="loadMoreNotes()">Load more</button>
         </div>
@@ -329,11 +336,10 @@
 
     </div><!-- /content -->
 
-    <!-- ── NOTE DETAIL PANEL ──────────────────────────── -->
+    <!-- ── NOTE DETAIL PANEL ── -->
     <div id="note-detail-panel" class="detail-pane hidden">
       <div class="detail-pane-inner">
 
-        <!-- Header -->
         <div class="detail-pane-header">
           <div class="detail-pane-title-row">
             <div class="detail-note-icon">
@@ -364,15 +370,12 @@
         </div>
 
         <div class="detail-pane-scroll">
-
-          <!-- Tags + body -->
           <div class="detail-pane-content">
             <div class="detail-tags" id="panel-tags"></div>
             <div class="note-panel-body" id="panel-body"></div>
             <div id="panel-insight-slot"></div>
           </div>
 
-          <!-- AI Summary -->
           <div id="ai-summary-block" class="detail-pane-side" style="display:none">
             <div class="detail-card">
               <div class="detail-card-head">
@@ -386,14 +389,11 @@
                   Ask a follow-up
                   <svg style="margin-left:auto" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
-                <button class="btn btn-ghost" id="copy-summary-btn" onclick="copySummary()" style="font-size:.78rem;min-height:36px;padding:0 12px">
-                  Copy
-                </button>
+                <button class="btn btn-ghost" id="copy-summary-btn" onclick="copySummary()" style="font-size:.78rem;min-height:36px;padding:0 12px">Copy</button>
               </div>
             </div>
           </div>
 
-          <!-- Connections -->
           <div class="detail-pane-side">
             <div class="detail-card" id="connections-section">
               <div class="detail-card-head">
@@ -411,7 +411,6 @@
               <div id="panel-similar" style="padding:0 10px 10px"></div>
             </div>
 
-            <!-- Actions -->
             <div class="detail-card">
               <div class="detail-card-head">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
@@ -428,7 +427,6 @@
                 </button>
               </div>
             </div>
-
           </div>
         </div>
 
@@ -459,7 +457,6 @@
   <div id="settings-popup" class="settings-popup hidden">
     <div class="settings-popup-inner">
 
-      <!-- Profile -->
       <div class="sp-profile">
         <div class="sp-avatar" id="sp-avatar">B</div>
         <div class="sp-profile-copy">
@@ -473,25 +470,14 @@
 
       <div class="sp-divider"></div>
 
-      <!-- Stats -->
       <div class="sp-stats">
-        <div class="sp-stat">
-          <div class="sp-stat-value" id="sp-stat-notes">0</div>
-          <div class="sp-stat-label">Notes</div>
-        </div>
-        <div class="sp-stat">
-          <div class="sp-stat-value" id="sp-stat-tags">0</div>
-          <div class="sp-stat-label">Tags</div>
-        </div>
-        <div class="sp-stat">
-          <div class="sp-stat-value" id="sp-stat-conn">0</div>
-          <div class="sp-stat-label">Links</div>
-        </div>
+        <div class="sp-stat"><div class="sp-stat-value" id="sp-stat-notes">0</div><div class="sp-stat-label">Notes</div></div>
+        <div class="sp-stat"><div class="sp-stat-value" id="sp-stat-tags">0</div><div class="sp-stat-label">Tags</div></div>
+        <div class="sp-stat"><div class="sp-stat-value" id="sp-stat-conn">0</div><div class="sp-stat-label">Links</div></div>
       </div>
 
       <div class="sp-divider"></div>
 
-      <!-- Theme -->
       <div class="sp-section-label">Theme</div>
       <div class="sp-theme-row">
         <button class="sp-theme-btn" data-theme="light" onclick="setTheme('light',this)">
@@ -510,7 +496,6 @@
 
       <div class="sp-divider"></div>
 
-      <!-- Accent -->
       <div class="sp-section-label">Accent color</div>
       <div class="sp-accent-row">
         <button class="sp-accent-btn active" data-accent="violet" onclick="setAccent('violet',this)" style="--c:#7b68ee"><span></span></button>
@@ -523,7 +508,6 @@
 
       <div class="sp-divider"></div>
 
-      <!-- Font size -->
       <div class="sp-section-label">Font size</div>
       <div class="sp-size-row">
         <button class="sp-size-btn" data-size="13" onclick="setFontSize(13,this)">S</button>
@@ -534,7 +518,6 @@
 
       <div class="sp-divider"></div>
 
-      <!-- Density -->
       <div class="sp-section-label">Note density</div>
       <div class="sp-density-row">
         <button class="sp-density-btn" data-density="compact" onclick="setDensity('compact',this)">
@@ -553,7 +536,6 @@
 
       <div class="sp-divider"></div>
 
-      <!-- Language -->
       <div class="sp-section-label">Interface language</div>
       <div class="sp-lang-row" id="sp-lang-row">
         <button class="sp-lang-btn active" data-lang="en" onclick="setSettingsLang('en',this)">EN</button>
@@ -566,63 +548,36 @@
 
       <div class="sp-divider"></div>
 
-      <!-- Preferences -->
       <div class="sp-section-label">Preferences</div>
       <div class="sp-prefs">
-
         <div class="sp-toggle-row" onclick="togglePref('snippets', document.getElementById('toggle-snippets'))">
-          <span class="sp-toggle-label">
-            <span>Show snippets</span>
-            <span class="sp-pref-sub">Preview text under title</span>
-          </span>
+          <span class="sp-toggle-label"><span>Show snippets</span><span class="sp-pref-sub">Preview text under title</span></span>
           <div class="sp-toggle on" id="toggle-snippets"><div class="sp-toggle-thumb"></div></div>
         </div>
-
         <div class="sp-toggle-row" onclick="togglePref('icons', document.getElementById('toggle-icons'))">
-          <span class="sp-toggle-label">
-            <span>Type icons</span>
-            <span class="sp-pref-sub">Colored icon per note category</span>
-          </span>
+          <span class="sp-toggle-label"><span>Type icons</span><span class="sp-pref-sub">Colored icon per note category</span></span>
           <div class="sp-toggle on" id="toggle-icons"><div class="sp-toggle-thumb"></div></div>
         </div>
-
         <div class="sp-toggle-row" onclick="togglePref('typewriter', document.getElementById('toggle-typewriter'))">
-          <span class="sp-toggle-label">
-            <span>Typewriter effect</span>
-            <span class="sp-pref-sub">Animate AI chat responses</span>
-          </span>
+          <span class="sp-toggle-label"><span>Typewriter effect</span><span class="sp-pref-sub">Animate AI chat responses</span></span>
           <div class="sp-toggle on" id="toggle-typewriter"><div class="sp-toggle-thumb"></div></div>
         </div>
-
         <div class="sp-toggle-row" onclick="togglePref('clickOpen', document.getElementById('toggle-click-open'))">
-          <span class="sp-toggle-label">
-            <span>Auto-open on click</span>
-            <span class="sp-pref-sub">Single click opens detail panel</span>
-          </span>
+          <span class="sp-toggle-label"><span>Auto-open on click</span><span class="sp-pref-sub">Single click opens detail panel</span></span>
           <div class="sp-toggle on" id="toggle-click-open"><div class="sp-toggle-thumb"></div></div>
         </div>
-
         <div class="sp-toggle-row" onclick="togglePref('blur', document.getElementById('toggle-blur'))">
-          <span class="sp-toggle-label">
-            <span>Blur sensitive content</span>
-            <span class="sp-pref-sub">Hover to reveal note snippets</span>
-          </span>
+          <span class="sp-toggle-label"><span>Blur sensitive content</span><span class="sp-pref-sub">Hover to reveal note snippets</span></span>
           <div class="sp-toggle" id="toggle-blur"><div class="sp-toggle-thumb"></div></div>
         </div>
-
         <div class="sp-toggle-row" onclick="togglePref('reduceMotion', document.getElementById('toggle-reduce-motion'))">
-          <span class="sp-toggle-label">
-            <span>Reduce motion</span>
-            <span class="sp-pref-sub">Disable animations</span>
-          </span>
+          <span class="sp-toggle-label"><span>Reduce motion</span><span class="sp-pref-sub">Disable animations</span></span>
           <div class="sp-toggle" id="toggle-reduce-motion"><div class="sp-toggle-thumb"></div></div>
         </div>
-
       </div>
 
       <div class="sp-divider"></div>
 
-      <!-- Data -->
       <div class="sp-section-label">Data</div>
       <div class="sp-actions">
         <button class="sp-action-btn" onclick="exportNotes()">
@@ -676,8 +631,6 @@
         </button>
       </div>
       <div class="ep-body">
-
-        <!-- Avatar -->
         <div class="ep-avatar-row">
           <div class="ep-avatar-big" id="ep-avatar-big">B</div>
           <div class="ep-avatar-info">
@@ -685,8 +638,6 @@
             <div class="ep-avatar-sub">Avatar is generated from your initials</div>
           </div>
         </div>
-
-        <!-- Avatar color -->
         <div class="ep-field-label">Avatar color</div>
         <div class="sp-accent-row" id="ep-avatar-color-row">
           <button class="sp-accent-btn active" data-avc="violet" onclick="setAvatarColor('violet',this)" style="--c:#7b68ee"><span></span></button>
@@ -696,24 +647,16 @@
           <button class="sp-accent-btn" data-avc="rose"   onclick="setAvatarColor('rose',this)"   style="--c:#f472b6"><span></span></button>
           <button class="sp-accent-btn" data-avc="orange" onclick="setAvatarColor('orange',this)" style="--c:#fb923c"><span></span></button>
         </div>
-
         <div class="sp-divider"></div>
-
-        <!-- Username -->
         <div class="ep-field">
           <label class="ep-field-label">Display name</label>
           <input id="ep-username-input" type="text" class="ep-input" placeholder="Your username" maxlength="32"/>
         </div>
-
-        <!-- Email -->
         <div class="ep-field">
           <label class="ep-field-label">Email</label>
           <input id="ep-email-input" type="email" class="ep-input" placeholder="your@email.com"/>
         </div>
-
         <div class="sp-divider"></div>
-
-        <!-- Change password -->
         <div class="ep-field-label" style="margin-bottom:8px">Change password</div>
         <div class="ep-field">
           <label class="ep-field-label">Current password</label>
@@ -727,10 +670,8 @@
           <label class="ep-field-label">Confirm new password</label>
           <input id="ep-confirm-password" type="password" class="ep-input" placeholder="••••••••" autocomplete="new-password"/>
         </div>
-
         <p id="ep-error" class="error-text hidden"></p>
         <p id="ep-success" class="ep-success hidden">Changes saved successfully ✓</p>
-
       </div>
       <div class="ep-footer">
         <button class="btn btn-ghost" onclick="closeEditProfile()">Cancel</button>
@@ -738,6 +679,7 @@
       </div>
     </div>
   </div>
+
 </div><!-- /view-app -->
 
 <!-- Search Overlay -->
@@ -745,14 +687,8 @@
   <div class="search-modal">
     <div class="search-modal-input">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input
-        id="search-input"
-        type="text"
-        placeholder="Search by meaning..."
-        oninput="debouncedSearch()"
-        onkeydown="handleSearchKey(event)"
-        autocomplete="off"
-      />
+      <input id="search-input" type="text" placeholder="Search by meaning..."
+        oninput="debouncedSearch()" onkeydown="handleSearchKey(event)" autocomplete="off"/>
       <span class="search-kbd">Esc</span>
     </div>
     <div id="search-results-list" class="search-results-list">
@@ -769,6 +705,7 @@
   <span id="toast-text"></span>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
 <script src="/static/i18n.js"></script>
 <script src="/static/editor.js"></script>
 <script src="/static/app.js"></script>
@@ -777,6 +714,5 @@
     navigator.serviceWorker.register("/static/sw.js").catch(() => {});
   }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
 </body>
 </html>
