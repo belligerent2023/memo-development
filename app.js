@@ -620,12 +620,24 @@ async function deleteCurrentNote() {
 // ── TAG FILTER ───────────────────────────────────────────────────────
 function filterByTag(tag, event) {
   if (event) event.stopPropagation();
-  _tagFilter = _tagFilter === tag ? null : tag;
+
+  // toggle: клик по активному тегу снимает фильтр
+  if (tag === null || _tagFilter === tag) {
+    _tagFilter = null;
+  } else {
+    _tagFilter = tag;
+  }
+
   renderTable();
+
   const indicator = document.getElementById("tag-filter-indicator");
   if (!indicator) return;
+
   if (_tagFilter) {
-    indicator.innerHTML = `${icon("tag")} &nbsp;${escHtml(_tagFilter)}&nbsp; <span onclick="filterByTag(_tagFilter)" style="opacity:.6;margin-left:4px">×</span>`;
+    const safeTag = escHtml(_tagFilter);
+    indicator.innerHTML =
+      `${icon("tag")} &nbsp;${safeTag}&nbsp; ` +
+      `<span style="opacity:.6;margin-left:4px">×</span>`;
     indicator.classList.remove("hidden");
     indicator.classList.add("active");
     indicator.onclick = () => filterByTag(_tagFilter);
@@ -641,53 +653,87 @@ function filterByTag(tag, event) {
 function renderTable() {
   const tbody = document.getElementById("notes-tbody");
   if (!tbody) return;
+
   const visibleNotes = getFilteredNotes();
 
+  // Пустой список после фильтров
   if (!visibleNotes.length) {
     tbody.innerHTML = "";
-    // Если фильтр по тегу — показываем текст внутри таблицы, кот не нужен
+
     if (_tagFilter) {
-      tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state-inline">
-        <p>No notes tagged "<strong>${escHtml(_tagFilter)}</strong>"
-        <button class="btn btn-ghost" style="margin-left:8px;font-size:.78rem;min-height:28px;padding:0 10px"
-          onclick="filterByTag(null)">Clear filter</button></p>
-      </div></td></tr>`;
+      const safeTag = escHtml(_tagFilter);
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4">
+            <div class="empty-state-inline">
+              <p>
+                No notes tagged "<strong>${safeTag}</strong>"
+                <button
+                  class="btn btn-ghost"
+                  style="margin-left:8px;font-size:.78rem;min-height:28px;padding:0 10px"
+                  onclick="filterByTag(null, event)"
+                >
+                  Clear filter
+                </button>
+              </p>
+            </div>
+          </td>
+        </tr>`;
     }
+
+    // Кот: показываем только если вообще нет заметок и нет активного тег‑фильтра
     updateEmptyState();
     return;
   }
 
-  tbody.innerHTML = visibleNotes.map(note => {
-    const title = clampText(noteTitle(note), 60);
-    const snippet = clampText(noteSnippet(note), 110);
-    const connCount = note.connections?.length || 0;
-    const tags = Array.isArray(note.tags) ? note.tags : [];
-    const isActive = String(note.id) === String(_currentNoteId);
-    const type = getNoteType(note);
+  // Есть заметки — кот скрывается
+  tbody.innerHTML = visibleNotes
+    .map((note) => {
+      const title = clampText(noteTitle(note), 60);
+      const snippet = clampText(noteSnippet(note), 110);
+      const connCount = note.connections?.length || 0;
 
-    const tagsHTML = tags.slice(0, 3).map(tag =>
-      `<span class="note-tag${_tagFilter === tag ? " active" : ""}" onclick="filterByTag(${JSON.stringify(tag)},event)">${escHtml(tag)}</span>`
-    ).join("");
+      // Новый источник тегов:
+      const baseTags = Array.isArray(note.tags) ? note.tags : [];
+      const aiTags = Array.isArray(note.ai_tags) ? note.ai_tags : [];
+      const userTags = Array.isArray(note.user_tags) ? note.user_tags : [];
+      const tags = baseTags.length
+        ? baseTags
+        : [...new Set([...userTags, ...aiTags])];
 
-    const connHTML = connCount
-      ? `<span class="conn-badge">${icon("connection")}<span>${connCount}</span></span>`
-      : `<span style="color:var(--text-4);font-size:.78rem;padding-left:4px">—</span>`;
+      const isActive = String(note.id) === String(_currentNoteId);
+      const type = getNoteType(note);
 
-    return `<tr class="${isActive ? 'active' : ''}" onclick="openNote('${String(note.id).replace(/'/g,"\\'")}')">
-      <td class="td-title-cell">
-        <div class="note-row-inner">
-          <div class="note-type-icon" style="--icon-color:${type.color}">${icon(type.icon)}</div>
-          <div class="note-row-copy">
-            <div class="note-row-title">${escHtml(title)}</div>
-            ${snippet ? `<div class="note-row-snippet">${escHtml(snippet)}</div>` : ""}
-          </div>
-        </div>
-      </td>
-      <td class="td-tags">${tagsHTML || `<span style="color:var(--text-4);font-size:.78rem">—</span>`}</td>
-      <td class="td-connections">${connHTML}</td>
-      <td class="td-date">${formatTime(note.created_at)}</td>
-    </tr>`;
-  }).join("");
+      const tagsHTML = tags.slice(0, 3).map((tag) => {
+        const safeTag = escHtml(tag);
+        const activeClass = _tagFilter === tag ? " active" : "";
+        const jsonTag = JSON.stringify(tag);
+        return `<span class="note-tag${activeClass}" onclick="filterByTag(${jsonTag}, event)">${safeTag}</span>`;
+      }).join("");
+
+      const connHTML = connCount
+        ? `<span class="conn-badge">${icon("connection")}<span>${connCount}</span></span>`
+        : `<span style="color:var(--text-4);font-size:.78rem;padding-left:4px">—</span>`;
+
+      return `
+        <tr class="${isActive ? "active" : ""}" onclick="openNote('${String(note.id).replace(/'/g, "\\'")}')">
+          <td class="td-title-cell">
+            <div class="note-row-inner">
+              <div class="note-type-icon" style="--icon-color:${type.color}">${icon(type.icon)}</div>
+              <div class="note-row-copy">
+                <div class="note-row-title">${escHtml(title)}</div>
+                ${snippet ? `<div class="note-row-snippet">${escHtml(snippet)}</div>` : ""}
+              </div>
+            </div>
+          </td>
+          <td class="td-tags">
+            ${tagsHTML || `<span style="color:var(--text-4);font-size:.78rem">—</span>`}
+          </td>
+          <td class="td-connections">${connHTML}</td>
+          <td class="td-date">${formatTime(note.created_at)}</td>
+        </tr>`;
+    })
+    .join("");
 
   updateEmptyState();
 }
@@ -696,29 +742,57 @@ function renderTable() {
 function renderPinned() {
   const el = document.getElementById("pinned-list");
   if (!el) return;
-  const pinned = _notes.filter(n => n.is_pinned);
-  const items  = pinned.length ? pinned : _notes.slice(0, 5);
-  el.innerHTML = items.map(note => {
-    const type = getNoteType(note);
-    return `<div class="pinned-note${note.is_pinned ? " pinned" : ""}" onclick="openNote('${note.id}')">
-      <span class="pinned-note-icon">${icon(type.icon)}</span>
-      <span class="pinned-note-title">${escHtml(clampText(noteTitle(note), 30))}</span>
-    </div>`;
-  }).join("");
+
+  const pinned = _notes.filter((n) => n.is_pinned);
+  const items = pinned.length ? pinned : _notes.slice(0, 5);
+
+  el.innerHTML = items
+    .map((note) => {
+      const type = getNoteType(note);
+      return `
+        <div class="pinned-note${note.is_pinned ? " pinned" : ""}" onclick="openNote('${note.id}')">
+          <span class="pinned-note-icon">${icon(type.icon)}</span>
+          <span class="pinned-note-title">${escHtml(clampText(noteTitle(note), 30))}</span>
+        </div>`;
+    })
+    .join("");
+
   renderSidebarTags();
 }
 
 function renderSidebarTags() {
   const el = document.getElementById("sidebar-tags");
   if (!el) return;
-  const allTags = [...new Set(_notes.flatMap(n => n.tags || []))].slice(0, 10);
-  el.innerHTML = allTags.length
-    ? allTags.map(tag => `
-        <button class="sidebar-tag${_tagFilter === tag ? " active" : ""}" onclick="filterByTag('${escHtml(tag)}', event)">
+
+  // Собираем теги из tags || (user_tags ∪ ai_tags)
+  const allTags = [
+    ...new Set(
+      _notes.flatMap((n) => {
+        if (Array.isArray(n.tags) && n.tags.length) return n.tags;
+        const ai = Array.isArray(n.ai_tags) ? n.ai_tags : [];
+        const user = Array.isArray(n.user_tags) ? n.user_tags : [];
+        return [...user, ...ai];
+      })
+    ),
+  ].slice(0, 10);
+
+  if (!allTags.length) {
+    el.innerHTML =
+      `<span style="font-size:.74rem;color:var(--text-4);padding:0 8px">No tags yet</span>`;
+    return;
+  }
+
+  el.innerHTML = allTags
+    .map((tag) => {
+      const safeTag = escHtml(tag);
+      const activeClass = _tagFilter === tag ? " active" : "";
+      return `
+        <button class="sidebar-tag${activeClass}" onclick="filterByTag(${JSON.stringify(tag)}, event)">
           <span class="sidebar-tag-icon">${icon("tag")}</span>
-          <span>${escHtml(tag)}</span>
-        </button>`).join("")
-    : `<span style="font-size:.74rem;color:var(--text-4);padding:0 8px">No tags yet</span>`;
+          <span>${safeTag}</span>
+        </button>`;
+    })
+    .join("");
 }
 
 // ── PIN ──────────────────────────────────────────────────────────────
@@ -766,19 +840,29 @@ async function openNote(noteId) {
   const panel = document.getElementById("note-detail-panel");
   if (panel) panel.classList.remove("hidden");
 
-  const titleEl    = document.getElementById("panel-title");
-  const dateEl     = document.getElementById("panel-date");
-  const tagsEl     = document.getElementById("panel-tags");
-  const body       = document.getElementById("panel-body");
+  const titleEl     = document.getElementById("panel-title");
+  const dateEl      = document.getElementById("panel-date");
+  const tagsEl      = document.getElementById("panel-tags");
+  const body        = document.getElementById("panel-body");
   const insightSlot = document.getElementById("panel-insight-slot");
 
   if (titleEl) titleEl.textContent = clampText(noteTitle(note), 72);
   if (dateEl)  dateEl.textContent  = formatDate(note.created_at);
 
   if (tagsEl) {
-    tagsEl.innerHTML = (note.tags || []).map(tag =>
-      `<span class="note-tag" onclick='filterByTag(${JSON.stringify(tag)}, event)'>${escHtml(tag)}</span>`
-    ).join("");
+    const baseTags  = Array.isArray(note.tags) ? note.tags : [];
+    const aiTags    = Array.isArray(note.ai_tags) ? note.ai_tags : [];
+    const userTags  = Array.isArray(note.user_tags) ? note.user_tags : [];
+
+    // Если бэк по какой‑то причине не прислал tags — соберём из ai+user
+    const allTags = baseTags.length ? baseTags : [...new Set([...userTags, ...aiTags])];
+
+    tagsEl.innerHTML = allTags.map(tag => {
+      const safeTag = escHtml(tag);
+      const jsonTag = JSON.stringify(tag);
+      // Можно позже визуально различать AI‑теги здесь по aiTags.includes(tag)
+      return `<span class="note-tag" onclick='filterByTag(${jsonTag}, event)'>${safeTag}</span>`;
+    }).join("");
   }
 
   if (body) {
@@ -827,7 +911,10 @@ async function openNote(noteId) {
 
   // Similar notes
   const connectedIds = new Set(connections.map(c => String(c.related_note_id)));
-  const similar = _notes.filter(n => String(n.id) !== String(noteId) && !connectedIds.has(String(n.id))).slice(0, 5);
+  const similar = _notes
+    .filter(n => String(n.id) !== String(noteId) && !connectedIds.has(String(n.id)))
+    .slice(0, 5);
+
   const similarEl = document.getElementById("panel-similar");
   if (similarEl) {
     similarEl.innerHTML = similar.length
@@ -853,7 +940,8 @@ async function openNote(noteId) {
   if (insightTrigger) {
     if (connections.length >= 2) {
       insightTrigger.style.display = "";
-      insightTrigger.onclick = () => generateInsightPanel(noteId, connections.map(c => c.related_note_id));
+      insightTrigger.onclick = () =>
+        generateInsightPanel(noteId, connections.map(c => c.related_note_id));
     } else {
       insightTrigger.style.display = "none";
     }
@@ -865,7 +953,8 @@ async function openNote(noteId) {
     if (connections.length >= 2) {
       insightSection.style.display = "";
       insightBtn.innerHTML = `<span>${icon("insight")}</span><span>${t("generate_insight", "Generate insight")}</span>`;
-      insightBtn.onclick = () => generateInsightPanel(noteId, connections.map(c => c.related_note_id));
+      insightBtn.onclick = () =>
+        generateInsightPanel(noteId, connections.map(c => c.related_note_id));
     } else {
       insightSection.style.display = "none";
     }
@@ -1824,16 +1913,26 @@ async function saveProfile() {
 })();
 // ── EMPTY STATE ──────────────────────────────────────────────────────
 function updateEmptyState() {
-  const wrap = document.getElementById("memo-cat-wrap");
+  const empty = document.getElementById("empty-state");
+  const wrap  = document.getElementById("memo-cat-wrap");
+  const board = document.querySelector(".notes-board");
   const tbody = document.getElementById("notes-tbody");
-  if (!wrap) return;
+  if (!empty || !board) return;
 
-  const hasNotes = _notes && _notes.length > 0;
-  wrap.style.display = hasNotes ? "none" : "";
+  const hasNotes = Array.isArray(_notes) && _notes.length > 0;
+  const hasTagFilter = !!_tagFilter;
 
-  // Если нет заметок — tbody тоже чистим
-  if (!hasNotes && tbody) {
-    tbody.innerHTML = "";
+  // Кот и пустое состояние:
+  // показываем только когда вообще нет заметок и нет активного тег‑фильтра
+  if (!hasNotes && !hasTagFilter) {
+    empty.classList.remove("hidden");   // весь empty-state блок
+    if (wrap) wrap.style.display = "";  // сам кот
+    board.classList.add("hidden");      // прячем таблицу
+    if (tbody) tbody.innerHTML = "";    // на всякий случай чистим
+  } else {
+    empty.classList.add("hidden");
+    if (wrap) wrap.style.display = "none";
+    board.classList.remove("hidden");
   }
 }
 
