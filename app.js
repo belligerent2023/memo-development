@@ -271,6 +271,7 @@ function switchAuthTab(tab) {
   qa(".tab-btn").forEach((b, i) => b.classList.toggle("active", (i === 0) === (tab === "login")));
 }
 
+
 async function handleLogin(e) {
   e.preventDefault();
   const errEl = document.getElementById("login-error");
@@ -293,6 +294,7 @@ async function handleLogin(e) {
   }
 }
 
+
 async function handleRegister(e) {
   e.preventDefault();
   const errEl = document.getElementById("reg-error");
@@ -314,15 +316,24 @@ async function handleRegister(e) {
   }
 }
 
+
 function bootApp(token, username) {
   _token = token;
   _user = { username };
-  const avatar = document.getElementById("user-avatar");
+
+  const avatar  = document.getElementById("user-avatar");
   const display = document.getElementById("user-display");
-  if (avatar) avatar.textContent = (username || "?").charAt(0).toUpperCase();
+  if (avatar)  avatar.textContent  = (username || "?").charAt(0).toUpperCase();
   if (display) display.textContent = username || "";
+
+  // Скрываем auth, показываем app
   document.getElementById("view-auth").style.display = "none";
   document.getElementById("view-app").classList.add("active");
+
+  // Показываем mobile nav только после авторизации
+  const mobileNav = document.getElementById("mobile-nav");
+  if (mobileNav) mobileNav.style.display = "";
+
   hydrateIcons();
   applyI18n();
   navigate("list");
@@ -331,6 +342,7 @@ function bootApp(token, username) {
   initDensity();
   applyPrefs();
   loadNotes();
+
   apiFetch("/users/me")
     .then(profile => {
       if (profile?.language && profile.language !== window._lang) {
@@ -342,11 +354,27 @@ function bootApp(token, username) {
     .catch(() => {});
 }
 
+
 function logout() {
-  _token = null; _user = null; _notes = [];
-  _page = 1; _hasMore = false; _currentNoteId = null; _chatHistory = [];
-  closeChat(); closeSearch(); closeNotePanel(); hideGraphTooltip();
+  _token = null;
+  _user  = null;
+  _notes = [];
+  _page  = 1;
+  _hasMore = false;
+  _currentNoteId = null;
+  _chatHistory   = [];
+
+  closeChat();
+  closeSearch();
+  closeNotePanel();
+  hideGraphTooltip();
+
+  // Скрываем app и mobile nav
   document.getElementById("view-app")?.classList.remove("active");
+  const mobileNav = document.getElementById("mobile-nav");
+  if (mobileNav) mobileNav.style.display = "none";
+
+  // Показываем auth
   document.getElementById("view-auth").style.display = "";
 }
 
@@ -412,19 +440,63 @@ function applyI18n() {
 
 function initLangGrid() {
   const grid = document.getElementById("reg-lang-grid");
-  if (!grid || typeof LANGUAGES === "undefined") return;
-  grid.innerHTML = LANGUAGES.slice(0, 12)
-    .map(l => `<button type="button" class="lang-option" onclick="selectRegLang('${l.code}',this)">
-      <span class="lang-flag">${(l.code || "").toUpperCase().slice(0, 2)}</span>
-      <span class="lang-name">${escHtml(l.name || l.code)}</span>
-    </button>`)
-    .join("");
+  const select = document.getElementById("reg-lang-select");
+  if (typeof LANGUAGES === "undefined") return;
+
+  // ── Плитки (десктоп) ──────────────────────────────────────────
+  if (grid) {
+    grid.innerHTML = LANGUAGES.slice(0, 12)
+      .map(l => `
+        <button type="button" class="lang-option" onclick="selectRegLang('${l.code}', this)">
+          <span class="lang-flag">${(l.code || "").toUpperCase().slice(0, 2)}</span>
+          <span class="lang-name">${escHtml(l.name || l.code)}</span>
+        </button>`)
+      .join("");
+  }
+
+  // ── Select (мобиле) ───────────────────────────────────────────
+  if (select) {
+    select.innerHTML = LANGUAGES.map(l => `
+      <option value="${escHtml(l.code)}">
+        ${escHtml(l.name || l.code)}
+      </option>`
+    ).join("");
+
+    // Синхронизируем select → _regLang + плитки
+    select.addEventListener("change", () => {
+      const code = select.value;
+      _regLang = code;
+      // Синхронизируем активную плитку если она видима
+      qa("#reg-lang-grid .lang-option").forEach(b => {
+        b.classList.toggle("selected", b.getAttribute("onclick").includes(`'${code}'`));
+      });
+    });
+  }
+
+  // Установить дефолтный язык — первый из списка
+  if (LANGUAGES.length) {
+    const defaultLang = LANGUAGES[0].code;
+    _regLang = defaultLang;
+    if (select) select.value = defaultLang;
+    // Активируем первую плитку
+    const firstBtn = grid?.querySelector(".lang-option");
+    if (firstBtn) firstBtn.classList.add("selected");
+  }
 }
+
 
 function selectRegLang(code, el) {
   _regLang = code;
+
+  // Снимаем selected со всех плиток
   qa("#reg-lang-grid .lang-option").forEach(b => b.classList.remove("selected"));
+
+  // Активируем нажатую плитку
   if (el) el.classList.add("selected");
+
+  // Синхронизируем select (мобиле)
+  const select = document.getElementById("reg-lang-select");
+  if (select) select.value = code;
 }
 
 async function changeLanguage(lang) {
@@ -1954,3 +2026,41 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => wrap.classList.remove("poked"), 500);
   });
 });
+// ── MOBILE NAVIGATION ───────────────────────────────────────────────
+function mobileNavigate(view) {
+  // Update bottom nav active state
+  ['list','canvas','chat'].forEach(v => {
+    const btn = document.getElementById(`mob-btn-${v}`);
+    if (btn) btn.classList.toggle('active', v === view);
+  });
+
+  if (view === 'chat') {
+    openChat();
+    return;
+  }
+
+  navigate(view);
+}
+
+function mobileQuickAction() {
+  const overlay = document.getElementById('mob-sheet-overlay');
+  if (overlay) overlay.classList.remove('hidden');
+}
+
+function closeMobileSheet() {
+  const overlay = document.getElementById('mob-sheet-overlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+
+// Sync bottom nav when navigating from sidebar (desktop) or JS
+const _origNavigate = navigate;
+window.navigate = function(view) {
+  _origNavigate(view);
+  // On mobile, sync bottom tab
+  if (window.innerWidth <= 760) {
+    ['list','canvas'].forEach(v => {
+      const btn = document.getElementById(`mob-btn-${v}`);
+      if (btn) btn.classList.toggle('active', v === view);
+    });
+  }
+};
