@@ -52,11 +52,14 @@ a { color: inherit; text-decoration: none; }
 /* ── AUTH ──────────────────────────────────────────────────────── */
 #view-auth {
   position: relative;
-  height: 100vh;
+  min-height: 100svh;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  justify-content: flex-start;
+  overflow-y: auto;
+  padding: 48px 20px 40px;
+  -webkit-overflow-scrolling: touch;
 }
 .auth-glow {
   position: absolute; inset: 0;
@@ -684,9 +687,6 @@ input:focus, textarea:focus {
 @media (max-width: 1080px) {
   :root { --detail-w: 380px; --sidebar-w: 230px; }
   .topbar-v2 { grid-template-columns: 180px 1fr auto; }
-}
-@media (max-width: 980px) {
-  #note-detail-panel { position: fixed; inset: 0; width: 100%; flex: none; z-index: 150; }
 }
 @media (max-width: 900px) {
   .notes-grid-head .td-tags, .notes-grid-head .td-connections { display: none; }
@@ -1527,7 +1527,6 @@ input:focus, textarea:focus {
 }
 .topbar-heading {
   display: flex;
-  align-items: center;
   gap: 8px;
 }
 
@@ -1840,17 +1839,12 @@ body.app-visible .mobile-nav {
   /* Empty state */
   .empty-state { min-height: 240px; }
 
-  /* Уже есть #view-app — добавь остальные */
-  #view-canvas {
-    padding-bottom: 80px;
-  }
-
   /* Graph hint и controls выше nav */
   .graph-hint {
-    bottom: 80px !important;
+    bottom: 80px;
   }
   .graph-controls {
-    bottom: 80px !important;
+    bottom: 80px;
   }
 
   /* Daily review scroll */
@@ -1864,14 +1858,6 @@ body.app-visible .mobile-nav {
   }
 }
 @media (max-width: 760px) {
-
-  #view-auth {
-    min-height: 100svh;         /* svh учитывает адресную строку Safari */
-    align-items: flex-start;    /* убираем center чтобы не обрезало */
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 40px 20px 40px;
-  }
 
   .auth-wrap {
     width: 100%;
