@@ -170,13 +170,6 @@ input:focus, textarea:focus {
   flex-shrink: 0;
 }
 .sidebar-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.sidebar-logo {
-  width: 34px; height: 34px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, var(--accent), var(--teal));
-  color: #fff; flex-shrink: 0;
-  box-shadow: 0 6px 16px rgba(123,104,238,0.22);
-}
 .sidebar-brand-copy { display: flex; flex-direction: column; min-width: 0; }
 .sidebar-brand-copy strong { font-size: .88rem; letter-spacing: -.02em; font-weight: 700; }
 .sidebar-brand-copy span { font-size: .72rem; color: var(--text-4); margin-top: 1px; }
@@ -1522,4 +1515,52 @@ input:focus, textarea:focus {
 .cat-yarn {
   animation: yarnBounce 2s ease-in-out infinite;
   transform-origin: 148px 125px;
+}
+.view-auth .auth-card {
+  /* у тебя уже есть стили, ниже только дополнение если нужно */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.auth-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.auth-logo-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;        /* если хочешь скругление */
+  object-fit: cover;
+}
+.topbar-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-logo-img {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.topbar-heading-text {
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-logo-img {
+  width: 24px;          /* можно 20–24px, подгони по вкусу */
+  height: 24px;
+  border-radius: 6px;   /* если хочешь скруглённые углы */
+  object-fit: cover;    /* красиво вписывает квадратный логотип */
 }
